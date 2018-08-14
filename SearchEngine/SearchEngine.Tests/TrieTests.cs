@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SearchEngine.Core;
 
 namespace SearchEngine.Tests
 {
     [TestFixture]
     public class TrieTests
     {
-        private readonly Random _random = new Random();
-
         [Test]
         public void ShouldThrowIfNullOrEmptyAdded()
         {
-            var trie = new Trie.Trie();
+            var trie = new Trie();
             Assert.Throws<ArgumentException>(() => trie.Add(null));
             Assert.Throws<ArgumentException>(() => trie.Add(string.Empty));
         }
@@ -20,7 +19,7 @@ namespace SearchEngine.Tests
         [Test]
         public void ShouldThrowIfNullOrEmptySearchByPrefix()
         {
-            var trie = new Trie.Trie();
+            var trie = new Trie();
             Assert.Throws<ArgumentException>(() => trie.SearchByPrefix(null));
             Assert.Throws<ArgumentException>(() => trie.SearchByPrefix(string.Empty));
         }
@@ -28,7 +27,7 @@ namespace SearchEngine.Tests
         [Test]
         public void ShouldSearchByPrefix()
         {
-            var trie = new Trie.Trie();
+            var trie = new Trie();
             trie.Add("ABC");
             trie.Add("ABCD");
             trie.Add("ABCDE");
@@ -42,7 +41,7 @@ namespace SearchEngine.Tests
         [Test]
         public void ShouldIndexInParallel()
         {
-            var trie = new Trie.Trie();
+            var trie = new Trie();
             trie.Add("ABCD");
             Parallel.For(0, 100000, i =>
             {
