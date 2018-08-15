@@ -70,6 +70,10 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SearchEngine.MemoryStore\SearchEngine.MemoryStore.csproj">
+      <Project>{F16E264E-767E-426A-8A3A-6789329C416F}</Project>
+      <Name>SearchEngine.MemoryStore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SearchEngine\SearchEngine.csproj">
       <Project>{11df8422-58d5-4c8f-8fbf-ff04304029b5}</Project>
       <Name>SearchEngine</Name>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace SearchEngine.Core
+namespace SearchEngine.MemoryStore
 {
     class TrieNode
     {

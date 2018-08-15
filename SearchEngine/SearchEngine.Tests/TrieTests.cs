@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SearchEngine.Core;
+using SearchEngine.MemoryStore;
 
 namespace SearchEngine.Tests
 {

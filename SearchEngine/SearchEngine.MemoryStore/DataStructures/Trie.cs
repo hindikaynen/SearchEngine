@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SearchEngine.Core
+namespace SearchEngine.MemoryStore
 {
     class Trie
     {

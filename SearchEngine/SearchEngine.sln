@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchEngine", "SearchEngin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchEngine.Tests", "SearchEngine.Tests\SearchEngine.Tests.csproj", "{4D297030-DAA4-4788-B0C7-D4150D839114}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchEngine.MemoryStore", "SearchEngine.MemoryStore\SearchEngine.MemoryStore.csproj", "{F16E264E-767E-426A-8A3A-6789329C416F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4D297030-DAA4-4788-B0C7-D4150D839114}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D297030-DAA4-4788-B0C7-D4150D839114}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D297030-DAA4-4788-B0C7-D4150D839114}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F16E264E-767E-426A-8A3A-6789329C416F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F16E264E-767E-426A-8A3A-6789329C416F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F16E264E-767E-426A-8A3A-6789329C416F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F16E264E-767E-426A-8A3A-6789329C416F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
