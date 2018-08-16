@@ -41,9 +41,9 @@ namespace SearchEngine.MemoryStore
             return _fieldStore.GetValue(docId, fieldName);
         }
 
-        public IEnumerable<string> SearchByPrefix(string prefix)
+        public IEnumerable<string> WildcardSearch(string pattern)
         {
-            return _trie.SearchByPrefix(prefix);
+            return _trie.WildcardSearch(pattern);
         }
 
         public void Dispose()

@@ -14,6 +14,6 @@ namespace SearchEngine
         void SetStoredFieldValue(long docId, string fieldName, string value);
         string GetStoredFieldValue(long docId, string fieldName);
 
-        IEnumerable<string> SearchByPrefix(string prefix);        
+        IEnumerable<string> WildcardSearch(string pattern);        
     }
 }

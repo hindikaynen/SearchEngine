@@ -65,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analysis\SimpleAnalyzerTests.cs" />
     <Compile Include="MemoryStore\DeletedDocsTests.cs" />
     <Compile Include="MemoryStore\FieldStoreTests.cs" />
     <Compile Include="MemoryStore\InvertedIndexTests.cs" />
@@ -89,6 +90,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestDocs\warandpeace.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

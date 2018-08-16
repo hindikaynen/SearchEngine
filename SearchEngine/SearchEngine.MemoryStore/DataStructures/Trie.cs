@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,6 +7,9 @@ namespace SearchEngine.MemoryStore
 {
     class Trie
     {
+        public const char Star = '*';
+        public const char QuestionMark = '?';
+
         private readonly TrieNode _root;
 
         public Trie()
@@ -27,34 +31,43 @@ namespace SearchEngine.MemoryStore
             current.Word = value;
         }
 
-        public IEnumerable<string> SearchByPrefix(string prefix)
+        public IEnumerable<string> WildcardSearch(string pattern)
         {
-            if (string.IsNullOrEmpty(prefix))
-                throw new ArgumentException(nameof(prefix));
+            if (string.IsNullOrEmpty(pattern))
+                throw new ArgumentException(nameof(pattern));
 
-            var current = _root;
-            foreach (var c in prefix)
+            IEnumerable<TrieNode> current = new[] { _root };
+            foreach (var c in pattern)
             {
-                if (!current.Children.TryGetValue(c, out current))
-                    return Enumerable.Empty<string>();
+                if (c == QuestionMark)
+                {
+                    current = current.SelectMany(node => node.Children.Values);
+                    continue;
+                }
+                if (c == Star)
+                {
+                    current = current.SelectMany(TraverseAll);
+                    continue;
+                }
+                current = current.Select(x =>
+                {
+                    TrieNode child;
+                    if (x.Children.TryGetValue(c, out child))
+                        return child;
+                    return null;
+                }).Where(x => x != null);
             }
-
-            return GetLeafs(current);
+            return current.Where(x => x.IsTerminal).Select(x => x.Word);
         }
 
-        private IEnumerable<string> GetLeafs(TrieNode node)
+        private IEnumerable<TrieNode> TraverseAll(TrieNode root)
         {
-            var stack = new Stack<TrieNode>();
-            stack.Push(node);
-            while (stack.Any())
+            yield return root;
+            foreach (var child in root.Children.Values)
             {
-                var current = stack.Pop();
-                if (current.IsTerminal)
-                    yield return current.Word;
-
-                foreach (var child in current.Children.Values)
+                foreach (var node in TraverseAll(child))
                 {
-                    stack.Push(child);
+                    yield return node;
                 }
             }
         }

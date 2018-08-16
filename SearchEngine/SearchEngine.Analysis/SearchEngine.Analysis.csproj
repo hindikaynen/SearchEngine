@@ -49,6 +49,7 @@
     <Compile Include="StopWordFilters\EnglishStopWordFilter.cs" />
     <Compile Include="StopWordFilters\RussianStopWordFilter.cs" />
     <Compile Include="Tokenizer\CharTokenizer.cs" />
+    <Compile Include="Tokenizer\LetterTokenizer.cs" />
     <Compile Include="Tokenizer\WhitespaceTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>

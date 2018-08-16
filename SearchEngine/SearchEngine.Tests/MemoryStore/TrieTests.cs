@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using SearchEngine.Analysis;
 using SearchEngine.MemoryStore;
 
 namespace SearchEngine.Tests
@@ -20,12 +23,12 @@ namespace SearchEngine.Tests
         public void ShouldThrowIfNullOrEmptySearchByPrefix()
         {
             var trie = new Trie();
-            Assert.Throws<ArgumentException>(() => trie.SearchByPrefix(null));
-            Assert.Throws<ArgumentException>(() => trie.SearchByPrefix(string.Empty));
+            Assert.Throws<ArgumentException>(() => trie.WildcardSearch(null));
+            Assert.Throws<ArgumentException>(() => trie.WildcardSearch(string.Empty));
         }
 
         [Test]
-        public void ShouldSearchByPrefix()
+        public void ShouldSearchWildcard()
         {
             var trie = new Trie();
             trie.Add("ABC");
@@ -34,7 +37,7 @@ namespace SearchEngine.Tests
             trie.Add("ABCDEF");
             trie.Add("ABDEF");
 
-            var found = trie.SearchByPrefix("ABCD");
+            var found = trie.WildcardSearch("ABCD*");
             CollectionAssert.AreEquivalent(new[] {"ABCD", "ABCDE", "ABCDEF"}, found);
         }
 
@@ -47,8 +50,30 @@ namespace SearchEngine.Tests
             {
                 trie.Add(Utils.RandomWord(10));
             });
-            var found = trie.SearchByPrefix("ABC");
+            var found = trie.WildcardSearch("ABC*");
             CollectionAssert.Contains(found, "ABCD");
+        }
+
+        [Test]
+        public void WarAndPeace()
+        {
+            var trie = new Trie();
+            var filePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDocs", "warandpeace.txt");
+            var tokenizer = new LetterTokenizer();
+
+            using (var reader = new StreamReader(File.OpenRead(filePath)))
+            {
+                foreach (var token in tokenizer.Tokenize(reader))
+                {
+                    trie.Add(token.ToLower());
+                }
+            }
+
+            var found = trie.WildcardSearch("при?ет").ToList();
+            CollectionAssert.AreEquivalent(new[] {"придет", "примет"}, found);
+
+            found = trie.WildcardSearch("здр*в?й*").ToList();
+            CollectionAssert.AreEquivalent(new[] { "здравый", "здравствуй", "здравствуйте" }, found);
         }
     }
 }

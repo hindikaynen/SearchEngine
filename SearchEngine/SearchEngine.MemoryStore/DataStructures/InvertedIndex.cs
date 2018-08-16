@@ -37,10 +37,12 @@ namespace SearchEngine.MemoryStore
             if (!index.TryGetValue(token, out postings))
                 return Enumerable.Empty<Posting>();
 
+            List<Posting> postingsCopy;
             lock (postings)
             {
-                return postings.Where(p => !_deletedDocs.Contains(p.DocId)).ToList();
+                postingsCopy = postings.ToList();
             }
+            return postingsCopy.Where(p => !_deletedDocs.Contains(p.DocId)).ToList();
         }
 
         public void MarkAsDeleted(long docId)

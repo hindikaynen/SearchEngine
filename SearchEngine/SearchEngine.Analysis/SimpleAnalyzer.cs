@@ -10,19 +10,19 @@ namespace SearchEngine.Analysis
         private readonly LowercaseProcessor _lowercaseProcessor = new LowercaseProcessor();
         private readonly RussianYeYoProcessor _russianYeYoProcessor = new RussianYeYoProcessor();
 
-        public override IEnumerable<string> Tokenize(StreamReader reader)
+        protected override IEnumerable<string> Tokenize(StreamReader reader)
         {
             return _tokenizer.Tokenize(reader);
         }
 
-        public override string ProcessToken(string token)
+        protected override string TransformToken(string token)
         {
             token = _lowercaseProcessor.ProcessToken(token);
             token = _russianYeYoProcessor.ProcessToken(token);
             return token;
         }
 
-        public override bool IsStopWord(string token)
+        protected override bool IsStopWord(string token)
         {
             return RussianStopWordFilter.IsStopWord(token) || EnglishStopWordFilter.IsStopWord(token);
         }
