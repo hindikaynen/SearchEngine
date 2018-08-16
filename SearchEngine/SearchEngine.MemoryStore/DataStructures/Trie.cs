@@ -62,12 +62,15 @@ namespace SearchEngine.MemoryStore
 
         private IEnumerable<TrieNode> TraverseAll(TrieNode root)
         {
-            yield return root;
-            foreach (var child in root.Children.Values)
+            Stack<TrieNode> stack = new Stack<TrieNode>();
+            stack.Push(root);
+            while (stack.Any())
             {
-                foreach (var node in TraverseAll(child))
+                var current = stack.Pop();
+                yield return current;
+                foreach (var child in current.Children.Values)
                 {
-                    yield return node;
+                    stack.Push(child);
                 }
             }
         }

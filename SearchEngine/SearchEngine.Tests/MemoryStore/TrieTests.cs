@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,11 +69,11 @@ namespace SearchEngine.Tests
                     trie.Add(token.ToLower());
                 }
             }
-
-            var found = trie.WildcardSearch("при?ет").ToList();
+            
+            var found = trie.WildcardSearch("при?ет");
             CollectionAssert.AreEquivalent(new[] {"придет", "примет"}, found);
 
-            found = trie.WildcardSearch("здр*в?й*").ToList();
+            found = trie.WildcardSearch("здр*в?й*");
             CollectionAssert.AreEquivalent(new[] { "здравый", "здравствуй", "здравствуйте" }, found);
         }
     }
