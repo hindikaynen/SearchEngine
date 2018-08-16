@@ -2,15 +2,21 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace SearchEngine.MemoryStore
 {
     class InvertedIndex : IDisposable
     {
+        private const int DefaultCleanUpPeriod = 10000;
+
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, List<Posting>>> _indexByFieldName = new ConcurrentDictionary<string, ConcurrentDictionary<string, List<Posting>>>();
-        private readonly HashSet<long> _deletedDocs = new HashSet<long>();
-        private readonly ReaderWriterLockSlim _deletedDocsLock = new ReaderWriterLockSlim();
+        private readonly DeletedDocs _deletedDocs = new DeletedDocs();
+        private readonly CleanUpTimer _cleanUpTimer;
+
+        public InvertedIndex(int cleanUpPeriod = DefaultCleanUpPeriod)
+        {
+            _cleanUpTimer = new CleanUpTimer(CleanUp, cleanUpPeriod);
+        }
 
         public void AddPosting(string fieldName, string token, Posting posting)
         {
@@ -31,40 +37,20 @@ namespace SearchEngine.MemoryStore
             if (!index.TryGetValue(token, out postings))
                 return Enumerable.Empty<Posting>();
 
-            List<Posting> result;
             lock (postings)
             {
-                result = postings.ToList();
+                return postings.Where(p => !_deletedDocs.Contains(p.DocId)).ToList();
             }
-
-            _deletedDocsLock.EnterReadLock();
-            try
-            {
-                result.RemoveAll(p => _deletedDocs.Contains(p.DocId));
-            }
-            finally
-            {
-                _deletedDocsLock.ExitReadLock();
-            }
-            return result;
         }
 
         public void MarkAsDeleted(long docId)
         {
-            _deletedDocsLock.EnterWriteLock();
-            try
-            {
-                _deletedDocs.Add(docId);
-            }
-            finally
-            {
-                _deletedDocsLock.ExitWriteLock();
-            }
+            _deletedDocs.Add(docId);
         }
 
-        public void CleanUp()
+        private void CleanUp()
         {
-            var toCleanUp = new HashSet<long>(_deletedDocs);
+            var toCleanUp = _deletedDocs.GetCopy();
             foreach (var index in _indexByFieldName.Values)
             {
                 foreach (var postings in index.Values)
@@ -75,20 +61,13 @@ namespace SearchEngine.MemoryStore
                     }
                 }
             }
-            _deletedDocsLock.EnterWriteLock();
-            try
-            {
-                _deletedDocs.ExceptWith(toCleanUp);
-            }
-            finally
-            {
-                _deletedDocsLock.ExitWriteLock();
-            }
+            _deletedDocs.ExceptWith(toCleanUp);
         }
 
         public void Dispose()
         {
-            _deletedDocsLock.Dispose();
+            _cleanUpTimer.Dispose();
+            _deletedDocs.Dispose();
         }
     }
 }

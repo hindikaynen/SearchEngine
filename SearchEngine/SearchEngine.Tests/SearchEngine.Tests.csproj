@@ -65,7 +65,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemoryStore\DeletedDocsTests.cs" />
     <Compile Include="MemoryStore\FieldStoreTests.cs" />
+    <Compile Include="MemoryStore\InvertedIndexTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MemoryStore\TrieTests.cs" />
     <Compile Include="Utils\Utils.cs" />

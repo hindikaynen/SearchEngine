@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataStructures\CleanUpTimer.cs" />
+    <Compile Include="DataStructures\DeletedDocs.cs" />
     <Compile Include="DataStructures\FieldStore.cs" />
     <Compile Include="DataStructures\InvertedIndex.cs" />
     <Compile Include="MemoryStore.cs" />

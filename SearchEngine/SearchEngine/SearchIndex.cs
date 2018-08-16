@@ -5,10 +5,10 @@ namespace SearchEngine
 {
     public class SearchIndex
     {
-        private readonly IAnalyzer _analyzer;
+        private readonly Analyzer _analyzer;
         private readonly IStore _store;
 
-        public SearchIndex(IAnalyzer analyzer, IStore store)
+        public SearchIndex(Analyzer analyzer, IStore store)
         {
             _analyzer = analyzer;
             _store = store;

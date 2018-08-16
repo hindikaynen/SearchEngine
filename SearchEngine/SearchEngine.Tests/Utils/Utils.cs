@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SearchEngine.Tests
 {
@@ -7,9 +8,9 @@ namespace SearchEngine.Tests
         private static readonly Random Random = new Random(DateTime.Now.Millisecond);
         private const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-        public static string RandomWord(int maxLength = 10)
+        public static string RandomWord(int minLength = 3, int maxLength = 10)
         {
-            var length = Random.Next(1, maxLength + 1);
+            var length = Random.Next(minLength, maxLength + 1);
             var result = new char[length];
             for (int i = 0; i < result.Length; i++)
             {
@@ -26,6 +27,16 @@ namespace SearchEngine.Tests
         public static int RandomInteger()
         {
             return Random.Next();
+        }
+
+        public static int RandomInteger(int minValue, int maxValue)
+        {
+            return Random.Next(minValue, maxValue);
+        }
+
+        public static T RandomElement<T>(List<T> list)
+        {
+            return list[RandomInteger(0, list.Count)];
         }
     }
 }

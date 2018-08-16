@@ -41,10 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analyzer\BaseAnalyzer.cs" />
+    <Compile Include="Analyzer\Analyzer.cs" />
     <Compile Include="Document\Document.cs" />
     <Compile Include="Document\Field.cs" />
-    <Compile Include="Analyzer\IAnalyzer.cs" />
     <Compile Include="Document\FieldFlags.cs" />
     <Compile Include="Document\StringField.cs" />
     <Compile Include="Document\TextField.cs" />

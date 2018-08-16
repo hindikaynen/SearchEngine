@@ -4,7 +4,7 @@ using System.IO;
 
 namespace SearchEngine.Analysis
 {
-    public class SimpleAnalyzer : BaseAnalyzer
+    public class SimpleAnalyzer : Analyzer
     {
         private readonly WhitespaceTokenizer _tokenizer = new WhitespaceTokenizer();
         private readonly LowercaseProcessor _lowercaseProcessor = new LowercaseProcessor();
