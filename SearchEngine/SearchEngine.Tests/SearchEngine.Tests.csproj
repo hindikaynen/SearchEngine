@@ -65,11 +65,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemoryStore\FieldStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrieTests.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="MemoryStore\TrieTests.cs" />
+    <Compile Include="Utils\Utils.cs" />
+    <Compile Include="Analysis\WhitespaceTokenizerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SearchEngine.Analysis\SearchEngine.Analysis.csproj">
+      <Project>{92135ACC-D18B-4C97-93E5-F37689ECD771}</Project>
+      <Name>SearchEngine.Analysis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SearchEngine.MemoryStore\SearchEngine.MemoryStore.csproj">
       <Project>{F16E264E-767E-426A-8A3A-6789329C416F}</Project>
       <Name>SearchEngine.MemoryStore</Name>
