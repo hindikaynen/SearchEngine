@@ -71,6 +71,7 @@
     <Compile Include="MemoryStore\InvertedIndexTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MemoryStore\TrieTests.cs" />
+    <Compile Include="Query\QueryTests.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Analysis\WhitespaceTokenizerTests.cs" />
   </ItemGroup>

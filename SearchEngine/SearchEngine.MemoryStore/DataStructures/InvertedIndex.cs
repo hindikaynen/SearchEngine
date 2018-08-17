@@ -9,7 +9,7 @@ namespace SearchEngine.MemoryStore
     {
         private const int DefaultCleanUpPeriod = 10000;
 
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, List<Posting>>> _indexByFieldName = new ConcurrentDictionary<string, ConcurrentDictionary<string, List<Posting>>>();
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, List<long>>> _indexByFieldName = new ConcurrentDictionary<string, ConcurrentDictionary<string, List<long>>>();
         private readonly DeletedDocs _deletedDocs = new DeletedDocs();
         private readonly CleanUpTimer _cleanUpTimer;
 
@@ -18,31 +18,31 @@ namespace SearchEngine.MemoryStore
             _cleanUpTimer = new CleanUpTimer(CleanUp, cleanUpPeriod);
         }
 
-        public void AddPosting(string fieldName, string token, Posting posting)
+        public void AddPosting(string fieldName, string token, long docId)
         {
-            var index = _indexByFieldName.GetOrAdd(fieldName, f => new ConcurrentDictionary<string, List<Posting>>());
-            var postings = index.GetOrAdd(token, t => new List<Posting>());
+            var index = _indexByFieldName.GetOrAdd(fieldName, f => new ConcurrentDictionary<string, List<long>>());
+            var postings = index.GetOrAdd(token, t => new List<long>());
             lock (postings)
             {
-                postings.Add(posting);
+                postings.Add(docId);
             }
         }
 
-        public IEnumerable<Posting> GetPostings(string fieldName, string token)
+        public IEnumerable<long> GetPostings(string fieldName, string token)
         {
-            ConcurrentDictionary<string, List<Posting>> index;
+            ConcurrentDictionary<string, List<long>> index;
             if (!_indexByFieldName.TryGetValue(fieldName, out index))
-                return Enumerable.Empty<Posting>();
-            List<Posting> postings;
+                return Enumerable.Empty<long>();
+            List<long> postings;
             if (!index.TryGetValue(token, out postings))
-                return Enumerable.Empty<Posting>();
+                return Enumerable.Empty<long>();
 
-            List<Posting> postingsCopy;
+            List<long> postingsCopy;
             lock (postings)
             {
                 postingsCopy = postings.ToList();
             }
-            return postingsCopy.Where(p => !_deletedDocs.Contains(p.DocId)).ToList();
+            return postingsCopy.Where(p => !_deletedDocs.Contains(p)).ToList();
         }
 
         public void MarkAsDeleted(long docId)
@@ -59,7 +59,7 @@ namespace SearchEngine.MemoryStore
                 {
                     lock (postings)
                     {
-                        postings.RemoveAll(p => toCleanUp.Contains(p.DocId));
+                        postings.RemoveAll(p => toCleanUp.Contains(p));
                     }
                 }
             }

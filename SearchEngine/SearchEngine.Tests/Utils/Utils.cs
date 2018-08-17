@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SearchEngine.Tests
 {
@@ -37,6 +38,16 @@ namespace SearchEngine.Tests
         public static T RandomElement<T>(List<T> list)
         {
             return list[RandomInteger(0, list.Count)];
+        }
+
+        public static Guid[] RandomIds(int count)
+        {
+            var result = new Guid[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = Guid.NewGuid();
+            }
+            return result;
         }
     }
 }

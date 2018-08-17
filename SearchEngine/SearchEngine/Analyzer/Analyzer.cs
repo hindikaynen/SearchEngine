@@ -18,23 +18,11 @@ namespace SearchEngine
             {
                 foreach (var token in Tokenize(reader))
                 {
-                    string processedToken;
-                    if (ProcessToken(token, out processedToken))
-                        yield return processedToken;
+                    var transformed = TransformToken(token);
+                    if (!IsStopWord(transformed))
+                        yield return transformed;
                 }
             }
-        }
-
-        public bool ProcessToken(string token, out string result)
-        {
-            var transformed = TransformToken(token);
-            if (!IsStopWord(transformed))
-            {
-                result = transformed;
-                return true;
-            }
-            result = default(string);
-            return false;
         }
     }
 }

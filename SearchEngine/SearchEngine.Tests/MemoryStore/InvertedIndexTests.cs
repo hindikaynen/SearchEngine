@@ -16,7 +16,7 @@ namespace SearchEngine.Tests
             CollectionAssert.IsEmpty(index.GetPostings(Utils.RandomString(), Utils.RandomString()));
 
             var fieldName = Utils.RandomString();
-            index.AddPosting(fieldName, Utils.RandomString(), new Posting(Utils.RandomInteger()));
+            index.AddPosting(fieldName, Utils.RandomString(), Utils.RandomInteger());
 
             CollectionAssert.IsEmpty(index.GetPostings(fieldName, Utils.RandomString()));
         }
@@ -32,17 +32,17 @@ namespace SearchEngine.Tests
             var docId2 = Utils.RandomInteger();
             var docId3 = Utils.RandomInteger();
 
-            index.AddPosting(fieldName, value1, new Posting(docId1));
-            index.AddPosting(fieldName, value2, new Posting(docId2));
-            index.AddPosting(fieldName, value2, new Posting(docId3));
+            index.AddPosting(fieldName, value1, docId1);
+            index.AddPosting(fieldName, value2, docId2);
+            index.AddPosting(fieldName, value2, docId3);
 
             var actual1 = index.GetPostings(fieldName, value1).ToList();
             Assert.AreEqual(1, actual1.Count);
-            Assert.AreEqual(docId1, actual1[0].DocId);
+            Assert.AreEqual(docId1, actual1[0]);
 
             var actual2 = index.GetPostings(fieldName, value2).ToList();
             Assert.AreEqual(2, actual2.Count);
-            CollectionAssert.AreEquivalent(new[] {docId2, docId3 }, actual2.Select(x => x.DocId));
+            CollectionAssert.AreEquivalent(new[] {docId2, docId3 }, actual2);
         }
 
         [Test]
@@ -56,18 +56,18 @@ namespace SearchEngine.Tests
             var docId2 = Utils.RandomInteger();
             var docId3 = Utils.RandomInteger();
 
-            index.AddPosting(fieldName, value1, new Posting(docId1));
-            index.AddPosting(fieldName, value2, new Posting(docId2));
-            index.AddPosting(fieldName, value2, new Posting(docId3));
+            index.AddPosting(fieldName, value1, docId1);
+            index.AddPosting(fieldName, value2, docId2);
+            index.AddPosting(fieldName, value2, docId3);
             index.MarkAsDeleted(docId2);
 
             var actual1 = index.GetPostings(fieldName, value1).ToList();
             Assert.AreEqual(1, actual1.Count);
-            Assert.AreEqual(docId1, actual1[0].DocId);
+            Assert.AreEqual(docId1, actual1[0]);
 
             var actual2 = index.GetPostings(fieldName, value2).ToList();
             Assert.AreEqual(1, actual2.Count);
-            Assert.AreEqual(docId3, actual2[0].DocId);
+            Assert.AreEqual(docId3, actual2[0]);
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace SearchEngine.Tests
             {
                 var field = Utils.RandomElement(fieldNames);
                 var value = Utils.RandomElement(values);
-                index.AddPosting(field, value, new Posting(Interlocked.Increment(ref currentDocId)));
+                index.AddPosting(field, value, Interlocked.Increment(ref currentDocId));
             });
 
             var docsCount = 0;

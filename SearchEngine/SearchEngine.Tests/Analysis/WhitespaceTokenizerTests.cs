@@ -13,11 +13,10 @@ namespace SearchEngine.Tests
         {
             var input = "    hello  pretty \r\n world   ";
             var tokenizer = new WhitespaceTokenizer();
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(input));
-            using (var reader = new StreamReader(stream))
+            using (var streamReader = input.AsStreamReader())
             {
-                var tokens = tokenizer.Tokenize(reader);
-                CollectionAssert.AreEquivalent(new[] {"hello", "pretty", "world"}, tokens);
+                var tokens = tokenizer.Tokenize(streamReader);
+                CollectionAssert.AreEquivalent(new[] { "hello", "pretty", "world" }, tokens);
             }
         }
 
@@ -29,10 +28,9 @@ namespace SearchEngine.Tests
             var word3 = Utils.RandomWord(1000, 1000);
             var input = $" \r\n   {word1}  {word2} \r\n {word3} ";
             var tokenizer = new WhitespaceTokenizer();
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(input));
-            using (var reader = new StreamReader(stream))
+            using (var streamReader = input.AsStreamReader())
             {
-                var tokens = tokenizer.Tokenize(reader);
+                var tokens = tokenizer.Tokenize(streamReader);
                 CollectionAssert.AreEquivalent(new[] { word1, word2, word3 }, tokens);
             }
         }

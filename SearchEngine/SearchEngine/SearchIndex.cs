@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SearchEngine
 {
-    public class SearchIndex
+    public class SearchIndex : IQueryRunner
     {
         private readonly Analyzer _analyzer;
         private readonly IStore _store;
@@ -25,7 +25,7 @@ namespace SearchEngine
             {
                 foreach (var token in GetTokens(field))
                 {
-                    _store.AddPosting(field.Name, token, new Posting(newDocId));
+                    _store.AddPosting(field.Name, token, newDocId);
                 }
             }
         }
@@ -33,9 +33,9 @@ namespace SearchEngine
         public void RemoveDocument(Term term)
         {
             var postings = _store.GetPostings(term.FieldName, term.Value);
-            foreach (var posting in postings)
+            foreach (var docId in postings)
             {
-                _store.RemoveDocument(posting.DocId);
+                _store.RemoveDocument(docId);
             }
         }
 
@@ -51,6 +51,22 @@ namespace SearchEngine
                 return new[] {field.ToString()};
 
             return _analyzer.Analyze(field.OpenReader);
+        }
+
+        IEnumerable<long> IQueryRunner.Search(string fieldName, string value)
+        {
+            var tokens = _analyzer.Analyze(value.AsStreamReader);
+            HashSet<long> result = new HashSet<long>();
+            foreach (var token in tokens)
+            {
+                var matches = _store.WildcardSearch(token);
+                foreach (var match in matches)
+                {
+                    var postings = _store.GetPostings(fieldName, match);
+                    result.UnionWith(postings);
+                }
+            }
+            return result;
         }
     }
 }

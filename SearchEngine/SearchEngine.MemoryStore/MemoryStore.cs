@@ -15,13 +15,13 @@ namespace SearchEngine.MemoryStore
             return Interlocked.Increment(ref _lastDocId);
         }
 
-        public void AddPosting(string fieldName, string token, Posting posting)
+        public void AddPosting(string fieldName, string token, long posting)
         {
             _invertedIndex.AddPosting(fieldName, token, posting);
             _trie.Add(token);
         }
 
-        public IEnumerable<Posting> GetPostings(string fieldName, string token)
+        public IEnumerable<long> GetPostings(string fieldName, string token)
         {
             return _invertedIndex.GetPostings(fieldName, token);
         }

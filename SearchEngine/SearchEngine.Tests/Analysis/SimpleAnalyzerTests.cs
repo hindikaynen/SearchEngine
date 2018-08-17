@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using SearchEngine.Analysis;
 
 namespace SearchEngine.Tests
@@ -13,9 +11,8 @@ namespace SearchEngine.Tests
         {
             var analyzer = new SimpleAnalyzer();
             string input = "HeLLo";
-            string output;
-            Assert.IsTrue(analyzer.ProcessToken(input, out output));
-            Assert.AreEqual("hello", output);
+            var tokens = analyzer.Analyze(() => input.AsStreamReader());
+            CollectionAssert.AreEqual(new[] { "hello" }, tokens);
         }
 
         [Test]
@@ -23,21 +20,17 @@ namespace SearchEngine.Tests
         {
             var analyzer = new SimpleAnalyzer();
             string input = "дёготь";
-            string output;
-            Assert.IsTrue(analyzer.ProcessToken(input, out output));
-            Assert.AreEqual("деготь", output);
+            var tokens = analyzer.Analyze(() => input.AsStreamReader());
+            CollectionAssert.AreEqual(new[] { "деготь" }, tokens);
         }
 
         [Test]
         public void ShouldAnalyze()
         {
             string input = "\r\n Лёгок         как на помине  ";
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(input)))
-            {
-                var analyzer = new SimpleAnalyzer();
-                var tokens = analyzer.Analyze(() => new StreamReader(stream));
-                CollectionAssert.AreEqual(new[] {"легок", "помине"}, tokens);
-            }
+            var analyzer = new SimpleAnalyzer();
+            var tokens = analyzer.Analyze(() => input.AsStreamReader());
+            CollectionAssert.AreEqual(new[] {"легок", "помине"}, tokens);
         }
     }
 }
