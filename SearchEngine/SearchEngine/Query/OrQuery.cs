@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SearchEngine
 {
-    public class OrQuery : IQuery
+    public class OrQuery : IAggregateQuery
     {
         public OrQuery()
         {

@@ -45,6 +45,7 @@
     <Compile Include="Processors\LowercaseProcessor.cs" />
     <Compile Include="Processors\RussianYeYoProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Analyzer.cs" />
     <Compile Include="SimpleAnalyzer.cs" />
     <Compile Include="StopWordFilters\EnglishStopWordFilter.cs" />
     <Compile Include="StopWordFilters\RussianStopWordFilter.cs" />

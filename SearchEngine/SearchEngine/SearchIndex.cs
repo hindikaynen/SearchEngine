@@ -1,25 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SearchEngine
 {
-    public class SearchIndex : IQueryRunner
+    public class SearchIndex : IQueryRunner, ISearchIndex
     {
-        private readonly Analyzer _analyzer;
+        private readonly IAnalyzer _analyzer;
         private readonly IStore _store;
 
-        public SearchIndex(Analyzer analyzer, IStore store)
+        public SearchIndex(IAnalyzer analyzer, IStore store)
         {
+            if (analyzer == null)
+                throw new ArgumentNullException(nameof(analyzer));
+            if (store == null)
+                throw new ArgumentNullException(nameof(store));
+
             _analyzer = analyzer;
             _store = store;
         }
 
         public void AddDocument(Document document)
         {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
+
             var newDocId = _store.NextDocId();
             foreach (var field in document.Fields.Where(x => x.Flags.HasFlag(FieldFlags.Stored)))
             {
-                _store.SetStoredFieldValue(newDocId, field.Name, field.ToString());
+                _store.SetStoredFieldValue(newDocId, field.Name, ReadFieldValue(field));
             }
             foreach (var field in document.Fields)
             {
@@ -32,6 +41,9 @@ namespace SearchEngine
 
         public void RemoveDocument(Term term)
         {
+            if (term == null)
+                throw new ArgumentNullException(nameof(term));
+
             var postings = _store.GetPostings(term.FieldName, term.Value);
             foreach (var docId in postings)
             {
@@ -39,16 +51,23 @@ namespace SearchEngine
             }
         }
 
-        public void UpdateDocument(Term term, Document document)
+        public List<long> Search(IQuery query)
         {
-            RemoveDocument(term);
-            AddDocument(document);
+            if (query == null)
+                throw new ArgumentNullException(nameof(query));
+
+            return query.Run(this).ToList();
+        }
+
+        public string GetFieldValue(long docId, string fieldName)
+        {
+            return _store.GetStoredFieldValue(docId, fieldName);
         }
 
         private IEnumerable<string> GetTokens(Field field)
         {
             if (!field.Flags.HasFlag(FieldFlags.Analyzed))
-                return new[] {field.ToString()};
+                return new[] {ReadFieldValue(field)};
 
             return _analyzer.Analyze(field.OpenReader);
         }
@@ -67,6 +86,14 @@ namespace SearchEngine
                 }
             }
             return result;
+        }
+
+        private static string ReadFieldValue(Field field)
+        {
+            using (var reader = field.OpenReader())
+            {
+                return reader.ReadToEnd();
+            }
         }
     }
 }

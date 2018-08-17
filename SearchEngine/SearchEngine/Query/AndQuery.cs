@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SearchEngine
 {
-    public class AndQuery : IQuery
+    public class AndQuery : IAggregateQuery
     {
         public AndQuery()
         {

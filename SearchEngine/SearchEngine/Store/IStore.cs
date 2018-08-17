@@ -7,7 +7,7 @@ namespace SearchEngine
     {
         long NextDocId();
 
-        void AddPosting(string fieldName, string token, long posting);
+        void AddPosting(string fieldName, string token, long docId);
         IEnumerable<long> GetPostings(string fieldName, string token);
         void RemoveDocument(long docId);
 

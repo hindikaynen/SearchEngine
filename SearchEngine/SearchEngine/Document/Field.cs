@@ -15,13 +15,5 @@ namespace SearchEngine
         public FieldFlags Flags { get; }
 
         public abstract StreamReader OpenReader();
-
-        public override string ToString()
-        {
-            using (var reader = OpenReader())
-            {
-                return reader.ReadToEnd();
-            }
-        }
     }
 }

@@ -41,16 +41,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analyzer\Analyzer.cs" />
+    <Compile Include="Analyzer\IAnalyzer.cs" />
     <Compile Include="Document\Document.cs" />
     <Compile Include="Document\Field.cs" />
     <Compile Include="Document\FieldFlags.cs" />
     <Compile Include="Document\StringField.cs" />
     <Compile Include="Document\TextField.cs" />
+    <Compile Include="ISearchIndex.cs" />
     <Compile Include="Query\AndQuery.cs" />
+    <Compile Include="Query\IAggregateQuery.cs" />
     <Compile Include="Query\IQuery.cs" />
     <Compile Include="Query\IQueryRunner.cs" />
     <Compile Include="Query\OrQuery.cs" />
+    <Compile Include="Query\QueryParser.cs" />
     <Compile Include="Query\Term.cs" />
     <Compile Include="Query\TermQuery.cs" />
     <Compile Include="Store\IStore.cs" />

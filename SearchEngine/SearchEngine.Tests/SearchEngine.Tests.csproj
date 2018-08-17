@@ -72,6 +72,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MemoryStore\TrieTests.cs" />
     <Compile Include="Query\QueryTests.cs" />
+    <Compile Include="SearchIndexTests.cs" />
+    <Compile Include="Utils\Mocks.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Analysis\WhitespaceTokenizerTests.cs" />
   </ItemGroup>

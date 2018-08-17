@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace SearchEngine.MemoryStore
 {
-    public class MemoryStore : IStore
+    public class InMemoryStore : IStore
     {
         private readonly InvertedIndex _invertedIndex = new InvertedIndex();
         private readonly FieldStore _fieldStore = new FieldStore();
@@ -15,9 +15,9 @@ namespace SearchEngine.MemoryStore
             return Interlocked.Increment(ref _lastDocId);
         }
 
-        public void AddPosting(string fieldName, string token, long posting)
+        public void AddPosting(string fieldName, string token, long docId)
         {
-            _invertedIndex.AddPosting(fieldName, token, posting);
+            _invertedIndex.AddPosting(fieldName, token, docId);
             _trie.Add(token);
         }
 
