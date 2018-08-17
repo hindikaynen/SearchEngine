@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using SearchEngine.Analysis;
@@ -29,7 +27,7 @@ namespace SearchEngine.Tests
         }
 
         [Test]
-        public void ShouldSearchWildcard()
+        public void ShouldSearchWildcardStarAtTheEnd()
         {
             var trie = new Trie();
             trie.Add("ABC");
@@ -40,6 +38,36 @@ namespace SearchEngine.Tests
 
             var found = trie.WildcardSearch("ABCD*");
             CollectionAssert.AreEquivalent(new[] {"ABCD", "ABCDE", "ABCDEF"}, found);
+        }
+
+        [Test]
+        public void ShouldSearchWildcardStarInTheMiddle()
+        {
+            var trie = new Trie();
+            trie.Add("ABC");
+            trie.Add("ABCD");
+            trie.Add("ABCDE");
+            trie.Add("ABCDEF");
+            trie.Add("ABDEF");
+
+            var found = trie.WildcardSearch("AB*EF");
+            CollectionAssert.AreEquivalent(new[] { "ABDEF", "ABCDEF" }, found);
+        }
+
+        [Test]
+        public void ShouldSearchWildcardQuestingMark()
+        {
+            var trie = new Trie();
+            trie.Add("ABC");
+            trie.Add("ABCD");
+            trie.Add("ABCDE");
+            trie.Add("ABDE");
+            trie.Add("ABFDE");
+            trie.Add("ABCDEF");
+            trie.Add("ABDEF");
+
+            var found = trie.WildcardSearch("AB?DE");
+            CollectionAssert.AreEquivalent(new[] { "ABCDE", "ABFDE" }, found);
         }
 
         [Test]
