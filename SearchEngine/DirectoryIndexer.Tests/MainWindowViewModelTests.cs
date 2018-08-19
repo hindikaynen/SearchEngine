@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using DirectoryIndexerApp;
 using Moq;
 using NUnit.Framework;
@@ -78,7 +77,7 @@ namespace DirectoryIndexer.Tests
 
                 try
                 {
-                    var actual = viewModel.SearchResults.ToArray();
+                    var actual = viewModel.SearchResults.OfType<string>().ToArray();
                     if(actual.OrderBy(x => x).SequenceEqual(searchResults.OrderBy(x => x)))
                         return;
                 }

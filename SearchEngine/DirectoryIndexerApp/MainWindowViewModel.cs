@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Input;
 using DirectoryIndexer;
 using DirectoryIndexerApp.Properties;
@@ -23,6 +24,7 @@ namespace DirectoryIndexerApp
         private readonly DelegateCommand<string> _searchCommand;
         private readonly ObservableCollection<string> _trackingDirectories = new ObservableCollection<string>();
         private readonly ObservableCollection<string> _searchResults = new ObservableCollection<string>();
+        private readonly CollectionViewSource _searchResultsSource = new CollectionViewSource();
         private bool _isIndexing;
         private bool _isSearching;
 
@@ -43,6 +45,9 @@ namespace DirectoryIndexerApp
 
             _addDirectoryCommand = new DelegateCommand(AddDirectory);
             _searchCommand = new DelegateCommand<string>(Search);
+
+            _searchResultsSource.Source = _searchResults;
+            _searchResultsSource.SortDescriptions.Add(new SortDescription(string.Empty, ListSortDirection.Ascending));
         }
 
         public bool IsIndexing
@@ -72,7 +77,7 @@ namespace DirectoryIndexerApp
         }
 
         public IEnumerable<string> TrackingDirectories => _trackingDirectories;
-        public IEnumerable<string> SearchResults => _searchResults;
+        public ICollectionView SearchResults => _searchResultsSource.View;
 
         public ICommand AddDirectoryCommand => _addDirectoryCommand;
         public ICommand SearchCommand => _searchCommand;

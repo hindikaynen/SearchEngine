@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Schedulers;
 using SearchEngine;
 
 namespace DirectoryIndexer
@@ -18,8 +19,9 @@ namespace DirectoryIndexer
         private readonly ConcurrentBag<DirectoryWatchdog> _watchdogs = new ConcurrentBag<DirectoryWatchdog>();
         private readonly ConcurrentDictionary<string, Task> _taskQueue = new ConcurrentDictionary<string, Task>();
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        private LimitedConcurrencyLevelTaskScheduler _scheduler;
         private int _indexingCount;
-
+        
         public Indexer(ISearchIndex searchIndex, string filter)
         {
             if (searchIndex == null)
@@ -27,6 +29,7 @@ namespace DirectoryIndexer
 
             _searchIndex = searchIndex;
             _filter = filter;
+            _scheduler = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount);
         }
 
         public event EventHandler<IndexingEventArgs> IndexingProgress; 
@@ -73,8 +76,8 @@ namespace DirectoryIndexer
         {
             NotifyProgress(Interlocked.Increment(ref _indexingCount));
             _taskQueue.AddOrUpdate(filePath,
-                path => Task.Factory.StartNew(action, _cts.Token),
-                (path, task) => task.ContinueWith(t => action(), _cts.Token));
+                path => Task.Factory.StartNew(action, _cts.Token, TaskCreationOptions.None, _scheduler),
+                (path, task) => task.ContinueWith(t => action(), _cts.Token, TaskContinuationOptions.None, _scheduler));
         }
 
         private void Index(string filePath)

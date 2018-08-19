@@ -1,8 +1,6 @@
-﻿using System.Windows;
-
-namespace DirectoryIndexerApp
+﻿namespace DirectoryIndexerApp
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {

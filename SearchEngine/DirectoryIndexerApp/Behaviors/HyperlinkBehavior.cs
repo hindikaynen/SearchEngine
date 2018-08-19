@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Documents;
-using System.Windows.Navigation;
 
 namespace DirectoryIndexerApp
 {
