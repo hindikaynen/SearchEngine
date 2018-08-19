@@ -1,8 +1,7 @@
-﻿using System.Linq;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
 
-namespace SearchEngine.Tests.Query
+namespace SearchEngine.Tests
 {
     [TestFixture]
     public class QueryTests

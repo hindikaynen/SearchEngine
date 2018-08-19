@@ -88,7 +88,7 @@ namespace SearchEngine.Tests
         {
             var trie = new Trie();
             var filePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDocs", "warandpeace.txt");
-            var tokenizer = new LetterTokenizer();
+            var tokenizer = new LetterOrDigitTokenizer();
 
             using (var reader = new StreamReader(File.OpenRead(filePath)))
             {

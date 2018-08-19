@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SearchEngine
 {
-    public interface ISearchIndex
+    public interface ISearchIndex : IDisposable
     {
         void AddDocument(Document document);
         void RemoveDocument(Term term);

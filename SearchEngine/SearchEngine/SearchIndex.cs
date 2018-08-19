@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SearchEngine
 {
-    public class SearchIndex : IQueryRunner, ISearchIndex
+    public class SearchIndex : ISearchIndex, IQueryRunner
     {
         private readonly IAnalyzer _analyzer;
         private readonly IStore _store;
@@ -94,6 +94,11 @@ namespace SearchEngine
             {
                 return reader.ReadToEnd();
             }
+        }
+
+        public void Dispose()
+        {
+            _store.Dispose();
         }
     }
 }

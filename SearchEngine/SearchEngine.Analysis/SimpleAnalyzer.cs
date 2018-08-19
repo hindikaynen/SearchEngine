@@ -5,7 +5,7 @@ namespace SearchEngine.Analysis
 {
     public class SimpleAnalyzer : Analyzer
     {
-        private readonly WhitespaceTokenizer _tokenizer = new WhitespaceTokenizer();
+        private readonly LetterOrDigitTokenizer _tokenizer = new LetterOrDigitTokenizer();
         private readonly LowercaseProcessor _lowercaseProcessor = new LowercaseProcessor();
         private readonly RussianYeYoProcessor _russianYeYoProcessor = new RussianYeYoProcessor();
 

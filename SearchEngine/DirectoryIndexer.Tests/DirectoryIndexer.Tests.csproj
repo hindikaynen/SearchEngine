@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4D297030-DAA4-4788-B0C7-D4150D839114}</ProjectGuid>
+    <ProjectGuid>{AD043809-C2A0-40FA-8CA8-A74ACA8FEEFB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SearchEngine.Tests</RootNamespace>
-    <AssemblyName>SearchEngine.Tests</AssemblyName>
+    <RootNamespace>DirectoryIndexer.Tests</RootNamespace>
+    <AssemblyName>DirectoryIndexer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -65,20 +65,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analysis\SimpleAnalyzerTests.cs" />
-    <Compile Include="MemoryStore\DeletedDocsTests.cs" />
-    <Compile Include="MemoryStore\FieldStoreTests.cs" />
-    <Compile Include="MemoryStore\InvertedIndexTests.cs" />
+    <Compile Include="DirectoryIndexerTests.cs" />
+    <Compile Include="DirectoryWatchdogTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MemoryStore\TrieTests.cs" />
-    <Compile Include="Query\QueryParserTests.cs" />
-    <Compile Include="Query\QueryTests.cs" />
-    <Compile Include="SearchIndexTests.cs" />
-    <Compile Include="Utils\Mocks.cs" />
-    <Compile Include="Utils\Utils.cs" />
-    <Compile Include="Analysis\WhitespaceTokenizerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DirectoryIndexer\DirectoryIndexer.csproj">
+      <Project>{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}</Project>
+      <Name>DirectoryIndexer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SearchEngine.Analysis\SearchEngine.Analysis.csproj">
       <Project>{92135ACC-D18B-4C97-93E5-F37689ECD771}</Project>
       <Name>SearchEngine.Analysis</Name>
@@ -88,17 +86,9 @@
       <Name>SearchEngine.MemoryStore</Name>
     </ProjectReference>
     <ProjectReference Include="..\SearchEngine\SearchEngine.csproj">
-      <Project>{11df8422-58d5-4c8f-8fbf-ff04304029b5}</Project>
+      <Project>{11DF8422-58D5-4C8F-8FBF-FF04304029B5}</Project>
       <Name>SearchEngine</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TestDocs\warandpeace.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

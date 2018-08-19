@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchEngine.MemoryStore", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchEngine.Analysis", "SearchEngine.Analysis\SearchEngine.Analysis.csproj", "{92135ACC-D18B-4C97-93E5-F37689ECD771}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryIndexer", "DirectoryIndexer\DirectoryIndexer.csproj", "{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryIndexer.Tests", "DirectoryIndexer.Tests\DirectoryIndexer.Tests.csproj", "{AD043809-C2A0-40FA-8CA8-A74ACA8FEEFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{92135ACC-D18B-4C97-93E5-F37689ECD771}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92135ACC-D18B-4C97-93E5-F37689ECD771}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92135ACC-D18B-4C97-93E5-F37689ECD771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD043809-C2A0-40FA-8CA8-A74ACA8FEEFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD043809-C2A0-40FA-8CA8-A74ACA8FEEFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD043809-C2A0-40FA-8CA8-A74ACA8FEEFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD043809-C2A0-40FA-8CA8-A74ACA8FEEFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
