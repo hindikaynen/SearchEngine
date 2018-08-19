@@ -8,7 +8,7 @@ using SearchEngine;
 
 namespace DirectoryIndexer
 {
-    public class DirectoryIndexer : IDisposable
+    public class Indexer : IDisposable
     {
         const string NameField = "name";
         const string ContentField = "content";
@@ -20,7 +20,7 @@ namespace DirectoryIndexer
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private int _indexingCount;
 
-        public DirectoryIndexer(ISearchIndex searchIndex, string filter)
+        public Indexer(ISearchIndex searchIndex, string filter)
         {
             if (searchIndex == null)
                 throw new ArgumentNullException(nameof(searchIndex));
@@ -29,7 +29,7 @@ namespace DirectoryIndexer
             _filter = filter;
         }
 
-        public event EventHandler<IndexingProgressEventArgs> IndexingProgress; 
+        public event EventHandler<IndexingEventArgs> IndexingProgress; 
 
         public void AddDirectory(string directoryPath)
         {
@@ -71,6 +71,7 @@ namespace DirectoryIndexer
 
         private void EnqueueTask(string filePath, Action action)
         {
+            NotifyProgress(Interlocked.Increment(ref _indexingCount));
             _taskQueue.AddOrUpdate(filePath,
                 path => Task.Factory.StartNew(action, _cts.Token),
                 (path, task) => task.ContinueWith(t => action(), _cts.Token));
@@ -78,7 +79,6 @@ namespace DirectoryIndexer
 
         private void Index(string filePath)
         {
-            NotifyProgress(Interlocked.Increment(ref _indexingCount));
             try
             {
                 Stream stream;
@@ -103,7 +103,6 @@ namespace DirectoryIndexer
 
         private void Unindex(string filePath)
         {
-            NotifyProgress(Interlocked.Increment(ref _indexingCount));
             try
             {
                 _searchIndex.RemoveDocument(new Term(NameField, filePath));
@@ -117,7 +116,10 @@ namespace DirectoryIndexer
 
         private void NotifyProgress(int count)
         {
-            IndexingProgress?.Invoke(this, new IndexingProgressEventArgs(count));
+            if (count == 1)
+                IndexingProgress?.Invoke(this, new IndexingEventArgs(true));
+            if (count == 0)
+                IndexingProgress?.Invoke(this, new IndexingEventArgs(false));
         }
 
         private bool WaitForFileUnlocked(string filePath, out Stream stream)

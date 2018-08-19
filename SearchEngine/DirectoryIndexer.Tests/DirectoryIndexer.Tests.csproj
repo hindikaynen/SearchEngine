@@ -65,14 +65,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectoryIndexerTests.cs" />
+    <Compile Include="IndexerTests.cs" />
     <Compile Include="DirectoryWatchdogTests.cs" />
+    <Compile Include="MainWindowViewModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\Properties.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DirectoryIndexerApp\DirectoryIndexerApp.csproj">
+      <Project>{CF56D497-C8DA-40EF-9E6A-D362D90FA409}</Project>
+      <Name>DirectoryIndexerApp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DirectoryIndexer\DirectoryIndexer.csproj">
       <Project>{BDD54B18-2B04-46B9-96CA-0D207CA1E1B0}</Project>
       <Name>DirectoryIndexer</Name>

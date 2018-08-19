@@ -51,7 +51,10 @@ namespace DirectoryIndexer
 
             NofifyExisted();
             _watcher.EnableRaisingEvents = true;
-            _processEventsThread = new Thread(ProcessEvents);
+            _processEventsThread = new Thread(ProcessEvents)
+            {
+                IsBackground = true
+            };
             _processEventsThread.Start();
         }
 

@@ -14,7 +14,7 @@ namespace SearchEngine.Analysis
             return _tokenizer.Tokenize(reader);
         }
 
-        protected override string TransformToken(string token)
+        public override string TransformToken(string token)
         {
             token = _lowercaseProcessor.ProcessToken(token);
             token = _russianYeYoProcessor.ProcessToken(token);

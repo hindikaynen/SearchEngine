@@ -48,7 +48,8 @@ namespace SearchEngine.Tests
         [Test]
         public void QueryRunnerSearch()
         {
-            var analyzer = new Mock<IAnalyzer>().SplitByWhitespace();
+            var analyzer = new Mock<IAnalyzer>();
+            analyzer.Setup(x => x.TransformToken(It.IsAny<string>())).Returns((string s) => s);
             var store = new Mock<IStore>();
             store.Setup(x => x.WildcardSearch(It.IsAny<string>())).Returns((string s) => new[] {s});
             store.Setup(x => x.WildcardSearch("wor*")).Returns(new[] {"world", "worry"});
@@ -57,9 +58,9 @@ namespace SearchEngine.Tests
             store.Setup(x => x.GetPostings("name", "world")).Returns(new long[] { 2, 3 });
             store.Setup(x => x.GetPostings("name", "worry")).Returns(new long[] { 3, 4 });
 
-            var result = runner.Search("name", "hello wor*");
+            var result = runner.Search("name", "wor*");
 
-            CollectionAssert.AreEquivalent(new[] {1, 2, 3, 4}, result);
+            CollectionAssert.AreEquivalent(new[] {2, 3, 4}, result);
         }
 
         [Test]

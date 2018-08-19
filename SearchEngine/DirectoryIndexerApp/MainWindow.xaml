@@ -1,0 +1,88 @@
+﻿<Window x:Class="DirectoryIndexerApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DirectoryIndexerApp"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type local:MainWindowViewModel}}"
+        Title="Directory indexer">
+    
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0" Name="IndexPanel">
+            <ItemsControl ItemsSource="{Binding TrackingDirectories}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <TextBlock Margin="0,0,0,5">
+                                <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
+                                    <TextBlock Text="{Binding}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            
+            <Button Content="Add directory..." Command="{Binding AddDirectoryCommand}"
+                    HorizontalAlignment="Left"
+                    Width="200"/>
+
+            <Grid Margin="0,5,0,0" Name="IndexingGrid"
+                  Visibility="{Binding IsIndexing, Converter={local:BooleanToVisibilityConverter FalseValue=Hidden}}">
+                <ProgressBar IsIndeterminate="True"/>
+                <TextBlock Text="Indexing in progress..."
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </StackPanel>
+        
+        <Grid Name="SearchGrid" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="Search string (supports wildcards):"></TextBlock>
+                <TextBox x:Name="SearchBox" Margin="0,5,0,0"
+                         HorizontalAlignment="Left"
+                         Width="300">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged">
+                            <i:InvokeCommandAction Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=SearchBox, Path=Text}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Hidden">
+                <ItemsControl ItemsSource="{Binding SearchResults}"
+                              Margin="0,5,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Margin="0,0,0,5">
+                            <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
+                                <TextBlock Text="{Binding}"/>
+                            </Hyperlink>
+                        </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VirtualizationMode="Recycling"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

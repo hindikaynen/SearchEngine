@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Threading;
 using NUnit.Framework;
 using SearchEngine;
 using SearchEngine.Analysis;
@@ -9,7 +10,7 @@ using SearchEngine.MemoryStore;
 namespace DirectoryIndexer.Tests
 {
     [TestFixture]
-    public class DirectoryIndexerTests
+    public class IndexerTests
     {
         private string _directory;
 
@@ -40,9 +41,9 @@ namespace DirectoryIndexer.Tests
             var analyzer = new SimpleAnalyzer();
             var store = new InMemoryStore();
 
-            BlockingCollection<IndexingProgressEventArgs> events = new BlockingCollection<IndexingProgressEventArgs>();
+            BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new DirectoryIndexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory);
 
@@ -66,9 +67,9 @@ namespace DirectoryIndexer.Tests
             var analyzer = new SimpleAnalyzer();
             var store = new InMemoryStore();
 
-            BlockingCollection<IndexingProgressEventArgs> events = new BlockingCollection<IndexingProgressEventArgs>();
+            BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new DirectoryIndexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory);
 
@@ -97,9 +98,9 @@ namespace DirectoryIndexer.Tests
             var analyzer = new SimpleAnalyzer();
             var store = new InMemoryStore();
 
-            BlockingCollection<IndexingProgressEventArgs> events = new BlockingCollection<IndexingProgressEventArgs>();
+            BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new DirectoryIndexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory);
 
@@ -127,9 +128,9 @@ namespace DirectoryIndexer.Tests
             var analyzer = new SimpleAnalyzer();
             var store = new InMemoryStore();
 
-            BlockingCollection<IndexingProgressEventArgs> events = new BlockingCollection<IndexingProgressEventArgs>();
+            BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new DirectoryIndexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory);
 
@@ -158,9 +159,9 @@ namespace DirectoryIndexer.Tests
             var analyzer = new SimpleAnalyzer();
             var store = new InMemoryStore();
 
-            BlockingCollection<IndexingProgressEventArgs> events = new BlockingCollection<IndexingProgressEventArgs>();
+            BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new DirectoryIndexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory);
 
@@ -175,13 +176,14 @@ namespace DirectoryIndexer.Tests
             CollectionAssert.AreEquivalent(new[] { file2, file3 }, result);
         }
 
-        private static void WaitForIndexed(BlockingCollection<IndexingProgressEventArgs> events)
+        private static void WaitForIndexed(BlockingCollection<IndexingEventArgs> events)
         {
+            Thread.Sleep(50);
             while (true)
             {
-                IndexingProgressEventArgs args;
+                IndexingEventArgs args;
                 Assert.IsTrue(events.TryTake(out args, 5000));
-                if(args.IndexingCount == 0)
+                if(!args.IsIndexing)
                     return;
             }
         }

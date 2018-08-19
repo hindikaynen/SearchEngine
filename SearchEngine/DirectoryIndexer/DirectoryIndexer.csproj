@@ -41,11 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectoryIndexer.cs" />
+    <Compile Include="Indexer.cs" />
     <Compile Include="DirectoryWatchdog\ChangeKind.cs" />
     <Compile Include="DirectoryWatchdog\DirectoryWatchdog.cs" />
     <Compile Include="DirectoryWatchdog\DirectoryWatchdogEventArgs.cs" />
-    <Compile Include="IndexingProgressEventArgs.cs" />
+    <Compile Include="IndexingEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

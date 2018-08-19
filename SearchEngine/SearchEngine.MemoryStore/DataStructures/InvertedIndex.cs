@@ -7,7 +7,7 @@ namespace SearchEngine.MemoryStore
 {
     class InvertedIndex : IDisposable
     {
-        private const int DefaultCleanUpPeriod = 10000;
+        private const int DefaultCleanUpPeriod = 60000;
 
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, List<long>>> _indexByFieldName = new ConcurrentDictionary<string, ConcurrentDictionary<string, List<long>>>();
         private readonly DeletedDocs _deletedDocs = new DeletedDocs();
