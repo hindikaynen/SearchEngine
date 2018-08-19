@@ -19,7 +19,7 @@ namespace DirectoryIndexer
         private readonly ConcurrentBag<DirectoryWatchdog> _watchdogs = new ConcurrentBag<DirectoryWatchdog>();
         private readonly ConcurrentDictionary<string, Task> _taskQueue = new ConcurrentDictionary<string, Task>();
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private LimitedConcurrencyLevelTaskScheduler _scheduler;
+        private readonly LimitedConcurrencyLevelTaskScheduler _scheduler;
         private int _indexingCount;
         
         public Indexer(ISearchIndex searchIndex, string filter)

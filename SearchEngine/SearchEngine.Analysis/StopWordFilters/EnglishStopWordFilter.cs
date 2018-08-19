@@ -2,7 +2,7 @@
 
 namespace SearchEngine.Analysis
 {
-    public class EnglishStopWordFilter
+    public static class EnglishStopWordFilter
     {
         private static readonly HashSet<string> StopWords = new HashSet<string> {
             "a", "an", "and", "are", "as", "at", "be", "but", "by",
