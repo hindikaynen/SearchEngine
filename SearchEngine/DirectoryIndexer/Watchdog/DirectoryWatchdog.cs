@@ -6,26 +6,25 @@ using System.Threading;
 
 namespace DirectoryIndexer
 {
-    class DirectoryWatchdog : IDisposable
+    class DirectoryWatchdog : IDisposable, IWatchdog
     {
         internal static readonly TimeSpan DuplicateChangedEventsTimeSpan = TimeSpan.FromMilliseconds(50);
 
         private readonly string _directoryPath;
         private readonly string _filter;
+        private readonly IWatchdogThread _watchdogThread;
         private readonly Regex _filterRegex;
         private readonly FileSystemWatcher _watcher;
-        private readonly BlockingCollection<DirectoryWatchdogEventArgs> _events = new BlockingCollection<DirectoryWatchdogEventArgs>();
         private readonly ConcurrentDictionary<string, DateTime> _lastUpdated = new ConcurrentDictionary<string, DateTime>();
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private Thread _processEventsThread;
         
-        public DirectoryWatchdog(string directoryPath, string filter)
+        public DirectoryWatchdog(string directoryPath, string filter, IWatchdogThread watchdogThread)
         {
             if (directoryPath == null)
                 throw new ArgumentNullException(nameof(directoryPath));
 
             _directoryPath = directoryPath;
             _filter = filter;
+            _watchdogThread = watchdogThread;
             _filterRegex = GetFilterRegex(filter);
             if (directoryPath == null)
                 throw new ArgumentNullException(nameof(directoryPath));
@@ -42,42 +41,26 @@ namespace DirectoryIndexer
             _watcher.Deleted += OnDeleted;
         }
 
-        public event EventHandler<DirectoryWatchdogEventArgs> Changed;
+        public event EventHandler<WatchdogEventArgs> Changed;
 
         public void Start()
         {
-            if(_processEventsThread != null)
-                throw new InvalidOperationException("Already started");
-
             NofifyExisted();
             _watcher.EnableRaisingEvents = true;
-            _processEventsThread = new Thread(ProcessEvents)
-            {
-                IsBackground = true
-            };
-            _processEventsThread.Start();
         }
-
-        private void ProcessEvents()
-        {
-            foreach (var args in _events.GetConsumingEnumerable(_cts.Token))
-            {
-                Changed?.Invoke(this, args);
-            }
-        }
-
+        
         private void NofifyExisted()
         {
             foreach (var filePath in Directory.GetFiles(_directoryPath, _filter, SearchOption.AllDirectories))
             {
-                Changed?.Invoke(this, new DirectoryWatchdogEventArgs(filePath, ChangeKind.Existed));
+                Changed?.Invoke(this, new WatchdogEventArgs(filePath, ChangeKind.Existed));
             }            
         }
 
         private void OnCreated(object sender, FileSystemEventArgs e)
         {
             _lastUpdated[e.FullPath] = DateTime.UtcNow;
-            _events.Add(new DirectoryWatchdogEventArgs(e.FullPath, ChangeKind.Created));
+            _watchdogThread.Enqueue(() => Changed?.Invoke(this, new WatchdogEventArgs(e.FullPath, ChangeKind.Created)));
         }
 
         private void OnChanged(object sender, FileSystemEventArgs e)
@@ -93,20 +76,20 @@ namespace DirectoryIndexer
 
             if (!filtered)
             {
-                _events.Add(new DirectoryWatchdogEventArgs(e.FullPath, ChangeKind.Updated));
+                _watchdogThread.Enqueue(() => Changed?.Invoke(this, new WatchdogEventArgs(e.FullPath, ChangeKind.Updated)));
             }
         }
 
         private void OnDeleted(object sender, FileSystemEventArgs e)
         {
-            _events.Add(new DirectoryWatchdogEventArgs(e.FullPath, ChangeKind.Deleted));
+            _watchdogThread.Enqueue(() => Changed?.Invoke(this, new WatchdogEventArgs(e.FullPath, ChangeKind.Deleted)));
         }
 
         private void OnRenamed(object sender, RenamedEventArgs e)
         {
-            _events.Add(new DirectoryWatchdogEventArgs(e.OldFullPath, ChangeKind.Deleted));
+            _watchdogThread.Enqueue(() => Changed?.Invoke(this, new WatchdogEventArgs(e.OldFullPath, ChangeKind.Deleted)));
             if(MatchesFilter(e.FullPath))
-                _events.Add(new DirectoryWatchdogEventArgs(e.FullPath, ChangeKind.Created));
+                _watchdogThread.Enqueue(() => Changed?.Invoke(this, new WatchdogEventArgs(e.FullPath, ChangeKind.Created)));
         }
 
         private static Regex GetFilterRegex(string filter)
@@ -137,8 +120,6 @@ namespace DirectoryIndexer
         {
             _watcher.EnableRaisingEvents = false;
             _watcher.Dispose();
-            _cts.Cancel();
-            _processEventsThread?.Join();
         }
     }
 }

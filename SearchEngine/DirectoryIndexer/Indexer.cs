@@ -15,28 +15,35 @@ namespace DirectoryIndexer
         const string ContentField = "content";
 
         private readonly ISearchIndex _searchIndex;
-        private readonly string _filter;
-        private readonly ConcurrentBag<DirectoryWatchdog> _watchdogs = new ConcurrentBag<DirectoryWatchdog>();
+        private readonly ConcurrentBag<IWatchdog> _watchdogs = new ConcurrentBag<IWatchdog>();
+        private readonly WatchdogThread _watchdogThread = new WatchdogThread();
         private readonly ConcurrentDictionary<string, Task> _taskQueue = new ConcurrentDictionary<string, Task>();
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private readonly LimitedConcurrencyLevelTaskScheduler _scheduler;
         private int _indexingCount;
         
-        public Indexer(ISearchIndex searchIndex, string filter)
+        public Indexer(ISearchIndex searchIndex)
         {
             if (searchIndex == null)
                 throw new ArgumentNullException(nameof(searchIndex));
 
             _searchIndex = searchIndex;
-            _filter = filter;
             _scheduler = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount);
         }
 
         public event EventHandler<IndexingEventArgs> IndexingProgress; 
 
-        public void AddDirectory(string directoryPath)
+        public void AddDirectory(string directoryPath, string filter)
         {
-            var watchdog = new DirectoryWatchdog(directoryPath, _filter);
+            var watchdog = new DirectoryWatchdog(directoryPath, filter, _watchdogThread);
+            watchdog.Changed += OnChanged;
+            watchdog.Start();
+            _watchdogs.Add(watchdog);
+        }
+
+        public void AddFile(string filePath)
+        {
+            var watchdog = new FileWatchdog(filePath, _watchdogThread);
             watchdog.Changed += OnChanged;
             watchdog.Start();
             _watchdogs.Add(watchdog);
@@ -55,7 +62,7 @@ namespace DirectoryIndexer
             }
         }
 
-        private void OnChanged(object sender, DirectoryWatchdogEventArgs e)
+        private void OnChanged(object sender, WatchdogEventArgs e)
         {
             switch (e.ChangeKind)
             {
@@ -151,7 +158,8 @@ namespace DirectoryIndexer
         public void Dispose()
         {
             _cts.Cancel();
-            DirectoryWatchdog watchdog;
+            _watchdogThread.Dispose();
+            IWatchdog watchdog;
             while (_watchdogs.TryTake(out watchdog))
             {
                 watchdog.Dispose();

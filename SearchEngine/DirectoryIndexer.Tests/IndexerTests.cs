@@ -43,9 +43,9 @@ namespace DirectoryIndexer.Tests
 
             BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store));
             indexer.IndexingProgress += (o, e) => events.Add(e);
-            indexer.AddDirectory(_directory);
+            indexer.AddDirectory(_directory, "*.txt");
 
             WaitForIndexed(events);
 
@@ -69,9 +69,9 @@ namespace DirectoryIndexer.Tests
 
             BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store));
             indexer.IndexingProgress += (o, e) => events.Add(e);
-            indexer.AddDirectory(_directory);
+            indexer.AddDirectory(_directory, "*.txt");
 
             WaitForIndexed(events);
 
@@ -100,9 +100,9 @@ namespace DirectoryIndexer.Tests
 
             BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store));
             indexer.IndexingProgress += (o, e) => events.Add(e);
-            indexer.AddDirectory(_directory);
+            indexer.AddDirectory(_directory, "*.txt");
 
             WaitForIndexed(events);
 
@@ -130,9 +130,9 @@ namespace DirectoryIndexer.Tests
 
             BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store));
             indexer.IndexingProgress += (o, e) => events.Add(e);
-            indexer.AddDirectory(_directory);
+            indexer.AddDirectory(_directory, "*.txt");
 
             WaitForIndexed(events);
 
@@ -161,9 +161,9 @@ namespace DirectoryIndexer.Tests
 
             BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
 
-            var indexer = new Indexer(new SearchIndex(analyzer, store), "*.txt");
+            var indexer = new Indexer(new SearchIndex(analyzer, store));
             indexer.IndexingProgress += (o, e) => events.Add(e);
-            indexer.AddDirectory(_directory);
+            indexer.AddDirectory(_directory, "*.txt");
 
             WaitForIndexed(events);
 

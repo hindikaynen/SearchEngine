@@ -9,17 +9,20 @@ namespace DirectoryIndexer.Tests
     public class DirectoryWatchdogTests
     {
         private string _directory;
+        private WatchdogThread _watchdogThread;
 
         [SetUp]
         public void SetUp()
         {
             _directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(_directory);
+            _watchdogThread = new WatchdogThread();
         }
 
         [TearDown]
         public void TearDown()
         {
+            _watchdogThread.Dispose();
             Directory.Delete(_directory, true);
         }
 
@@ -28,8 +31,8 @@ namespace DirectoryIndexer.Tests
         {
             File.WriteAllBytes(Path.Combine(_directory, "1.txt"), new byte[] { 1, 2, 3 });
             File.WriteAllBytes(Path.Combine(_directory, "2.pdf"), new byte[] { 1, 2, 3 });
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -49,8 +52,8 @@ namespace DirectoryIndexer.Tests
             var subdirectory = Path.Combine(_directory, "sub");
             Directory.CreateDirectory(subdirectory);
             File.WriteAllBytes(Path.Combine(subdirectory, "1.txt"), new byte[] { 1, 2, 3 });
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -67,8 +70,8 @@ namespace DirectoryIndexer.Tests
         [Test]
         public void ShouldFireIfCreatedRemoved()
         {
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -98,8 +101,8 @@ namespace DirectoryIndexer.Tests
         [Test]
         public void ShouldFireIfRenamed()
         {
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -134,8 +137,8 @@ namespace DirectoryIndexer.Tests
         [Test]
         public void ShouldFireIfMoved()
         {
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -170,8 +173,8 @@ namespace DirectoryIndexer.Tests
         [Test]
         public void ShouldFireIfRenamedToFiltered()
         {
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -201,8 +204,8 @@ namespace DirectoryIndexer.Tests
         [Test]
         public void ShouldFireIfMovedOutside()
         {
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -235,8 +238,8 @@ namespace DirectoryIndexer.Tests
         [Test]
         public void ShouldFireIfMovedFromOutside()
         {
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -269,8 +272,8 @@ namespace DirectoryIndexer.Tests
 
             File.WriteAllBytes(Path.Combine(subdirectory, "1.txt"), new byte[] { 1, 2, 3 });
 
-            var watchdog = new DirectoryWatchdog(_directory, "*.txt");
-            var events = new BlockingCollection<DirectoryWatchdogEventArgs>();
+            var watchdog = new DirectoryWatchdog(_directory, "*.txt", _watchdogThread);
+            var events = new BlockingCollection<WatchdogEventArgs>();
             watchdog.Changed += (o, e) => events.Add(e);
             watchdog.Start();
 
@@ -291,9 +294,9 @@ namespace DirectoryIndexer.Tests
             watchdog.Dispose();
         }
 
-        private static void NoMoreEvents(BlockingCollection<DirectoryWatchdogEventArgs> events)
+        private static void NoMoreEvents(BlockingCollection<WatchdogEventArgs> events)
         {
-            DirectoryWatchdogEventArgs args;
+            WatchdogEventArgs args;
             if(events.TryTake(out args, 100))
                 Assert.Fail($"No more events expected but was {args.ChangeKind} on {args.FilePath}");
         }

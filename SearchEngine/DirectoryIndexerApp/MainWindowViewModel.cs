@@ -40,7 +40,7 @@ namespace DirectoryIndexerApp
 
             var analyzer = new SimpleAnalyzer();
             var store = new InMemoryStore();
-            _indexer = new Indexer(new SearchIndex(analyzer, store), TxtFilter);
+            _indexer = new Indexer(new SearchIndex(analyzer, store));
             _indexer.IndexingProgress += OnIndexingProgress;
 
             _addDirectoryCommand = new DelegateCommand(AddDirectory);
@@ -91,7 +91,7 @@ namespace DirectoryIndexerApp
             if(_trackingDirectories.Contains(directory))
                 return;
 
-            _indexer.AddDirectory(directory);
+            _indexer.AddDirectory(directory, TxtFilter);
             _trackingDirectories.Add(directory);
         }
 

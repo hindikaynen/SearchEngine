@@ -46,11 +46,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Indexer.cs" />
-    <Compile Include="DirectoryWatchdog\ChangeKind.cs" />
-    <Compile Include="DirectoryWatchdog\DirectoryWatchdog.cs" />
-    <Compile Include="DirectoryWatchdog\DirectoryWatchdogEventArgs.cs" />
+    <Compile Include="Watchdog\ChangeKind.cs" />
+    <Compile Include="Watchdog\DirectoryWatchdog.cs" />
+    <Compile Include="Watchdog\FileWatchdog.cs" />
+    <Compile Include="Watchdog\IWatchdogThread.cs" />
+    <Compile Include="Watchdog\WatchdogEventArgs.cs" />
     <Compile Include="IndexingEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Watchdog\IWatchdog.cs" />
+    <Compile Include="Watchdog\WatchdogThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SearchEngine.Analysis\SearchEngine.Analysis.csproj">

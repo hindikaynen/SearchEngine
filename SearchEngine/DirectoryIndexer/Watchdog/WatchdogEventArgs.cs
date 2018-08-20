@@ -1,8 +1,8 @@
 ﻿namespace DirectoryIndexer
 {
-    class DirectoryWatchdogEventArgs
+    class WatchdogEventArgs
     {
-        public DirectoryWatchdogEventArgs(string filePath, ChangeKind changeKind)
+        public WatchdogEventArgs(string filePath, ChangeKind changeKind)
         {
             FilePath = filePath;
             ChangeKind = changeKind;
