@@ -2,11 +2,10 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace DirectoryIndexer
 {
-    class DirectoryWatchdog : IDisposable, IWatchdog
+    class DirectoryWatchdog : IWatchdog
     {
         internal static readonly TimeSpan DuplicateChangedEventsTimeSpan = TimeSpan.FromMilliseconds(50);
 

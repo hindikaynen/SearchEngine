@@ -21,8 +21,9 @@ namespace DirectoryIndexerApp
         private readonly IDispatcher _dispatcher;
         private readonly Indexer _indexer;
         private readonly DelegateCommand _addDirectoryCommand;
+        private readonly DelegateCommand _addFilesCommand;
         private readonly DelegateCommand<string> _searchCommand;
-        private readonly ObservableCollection<string> _trackingDirectories = new ObservableCollection<string>();
+        private readonly ObservableCollection<string> _trackingPaths = new ObservableCollection<string>();
         private readonly ObservableCollection<string> _searchResults = new ObservableCollection<string>();
         private readonly CollectionViewSource _searchResultsSource = new CollectionViewSource();
         private bool _isIndexing;
@@ -44,6 +45,7 @@ namespace DirectoryIndexerApp
             _indexer.IndexingProgress += OnIndexingProgress;
 
             _addDirectoryCommand = new DelegateCommand(AddDirectory);
+            _addFilesCommand = new DelegateCommand(AddFiles);
             _searchCommand = new DelegateCommand<string>(Search);
 
             _searchResultsSource.Source = _searchResults;
@@ -76,10 +78,11 @@ namespace DirectoryIndexerApp
             }
         }
 
-        public IEnumerable<string> TrackingDirectories => _trackingDirectories;
+        public IEnumerable<string> TrackingPaths => _trackingPaths;
         public ICollectionView SearchResults => _searchResultsSource.View;
 
         public ICommand AddDirectoryCommand => _addDirectoryCommand;
+        public ICommand AddFilesCommand => _addFilesCommand;
         public ICommand SearchCommand => _searchCommand;
 
         private void AddDirectory()
@@ -88,11 +91,27 @@ namespace DirectoryIndexerApp
             if(!_dialogService.ShowOpenFolderDialog(Resources.OpenDirectoryDescription, out directory))
                 return;
 
-            if(_trackingDirectories.Contains(directory))
+            if(_trackingPaths.Contains(directory))
                 return;
 
             _indexer.AddDirectory(directory, TxtFilter);
-            _trackingDirectories.Add(directory);
+            _trackingPaths.Add(directory);
+        }
+
+        private void AddFiles()
+        {
+            IEnumerable<string> filePaths;
+            if (!_dialogService.ShowOpenFilesDialog(Resources.OpenFilesDescription, out filePaths))
+                return;
+
+            foreach (var filePath in filePaths)
+            {
+                if (_trackingPaths.Contains(filePath))
+                    return;
+
+                _indexer.AddFile(filePath);
+                _trackingPaths.Add(filePath);
+            }
         }
 
         private void OnIndexingProgress(object sender, IndexingEventArgs e)

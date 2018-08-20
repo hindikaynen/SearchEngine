@@ -13,6 +13,13 @@ namespace DirectoryIndexer
         public WatchdogThread()
         {
             _thread = new Thread(Processing) { IsBackground = true };
+            _thread.Start();
+        }
+
+        public void Enqueue(Action action)
+        {
+            if (!_actions.IsAddingCompleted)
+                _actions.Add(action);
         }
 
         private void Processing()
@@ -28,12 +35,6 @@ namespace DirectoryIndexer
             _cts.Cancel();
             _actions.CompleteAdding();
             _thread.Join();
-        }
-
-        public void Enqueue(Action action)
-        {
-            if(!_actions.IsAddingCompleted)
-                _actions.Add(action);
         }
     }
 }

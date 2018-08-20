@@ -43,7 +43,9 @@ namespace DirectoryIndexer
 
         public void AddFile(string filePath)
         {
-            var watchdog = new FileWatchdog(filePath, _watchdogThread);
+            var directory = Path.GetDirectoryName(filePath);
+            var filter = Path.GetFileName(filePath);
+            var watchdog = new DirectoryWatchdog(directory, filter, _watchdogThread);
             watchdog.Changed += OnChanged;
             watchdog.Start();
             _watchdogs.Add(watchdog);

@@ -120,4 +120,7 @@
   <data name="OpenDirectoryDescription" xml:space="preserve">
     <value>Select a directory to index</value>
   </data>
+  <data name="OpenFilesDescription" xml:space="preserve">
+    <value>Select files to index</value>
+  </data>
 </root>

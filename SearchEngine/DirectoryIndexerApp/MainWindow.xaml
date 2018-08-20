@@ -16,22 +16,30 @@
         </Grid.RowDefinitions>
         
         <StackPanel Grid.Row="0" Name="IndexPanel">
-            <ItemsControl ItemsSource="{Binding TrackingDirectories}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <TextBlock Margin="0,0,0,5">
-                                <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
-                                    <TextBlock Text="{Binding}"/>
-                                </Hyperlink>
-                            </TextBlock>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ScrollViewer MaxHeight="250">
+                <ItemsControl ItemsSource="{Binding TrackingPaths}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <TextBlock Margin="0,0,0,5">
+                                    <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
+                                        <TextBlock Text="{Binding}"/>
+                                    </Hyperlink>
+                                </TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
             
             <Button Content="Add directory..." Command="{Binding AddDirectoryCommand}"
                     HorizontalAlignment="Left"
+                    Margin="0,5,0,0"
+                    Width="200"/>
+
+            <Button Content="Add files..." Command="{Binding AddFilesCommand}"
+                    HorizontalAlignment="Left"
+                    Margin="0,5,0,0"
                     Width="200"/>
 
             <Grid Margin="0,5,0,0" Name="IndexingGrid"

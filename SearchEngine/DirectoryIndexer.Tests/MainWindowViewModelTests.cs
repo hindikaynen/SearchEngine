@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using DirectoryIndexerApp;
 using Moq;
 using NUnit.Framework;
@@ -37,8 +38,12 @@ namespace DirectoryIndexer.Tests
             var dialogService = new Mock<IDialogService>();
             dialogService.Setup(x => x.ShowOpenFolderDialog(It.IsAny<string>(), out _directory)).Returns(true);
 
+            var callbacks = new BlockingCollection<Action>();
+
             var dispatcher = new Mock<IDispatcher>();
-            dispatcher.Setup(x => x.BeginInvoke(It.IsAny<Action>())).Callback((Action action) => action());
+            dispatcher.Setup(x => x.BeginInvoke(It.IsAny<Action>())).Callback((Action action) => callbacks.Add(action));
+
+            SynchronizationContext.SetSynchronizationContext(new TestDispatcherSynchronizationContext(dispatcher.Object));
 
             var events = new BlockingCollection<PropertyChangedEventArgs>();
 
@@ -46,17 +51,18 @@ namespace DirectoryIndexer.Tests
             viewModel.PropertyChanged += (o, e) => events.Add(e);
             viewModel.AddDirectoryCommand.Execute(_directory);
 
-            WaitForIndexed(events, viewModel);
+            WaitForIndexed(events, callbacks, viewModel);
 
             viewModel.SearchCommand.Execute("he?lo");
 
-            WaitForSearchResults(viewModel, new[] {filePath});
+            WaitForSearchResults(viewModel, callbacks, new[] {filePath});
         }
 
-        private static void WaitForIndexed(BlockingCollection<PropertyChangedEventArgs> events, MainWindowViewModel viewModel)
+        private static void WaitForIndexed(BlockingCollection<PropertyChangedEventArgs> events, BlockingCollection<Action> callbacks, MainWindowViewModel viewModel)
         {
             while (true)
             {
+                ProcessCallbacks(callbacks);
                 PropertyChangedEventArgs args;
                 Assert.IsTrue(events.TryTake(out args, 5000));
                 if (args.PropertyName == Properties.GetName<MainWindowViewModel>(vm => vm.IsIndexing))
@@ -64,10 +70,11 @@ namespace DirectoryIndexer.Tests
                     if (!viewModel.IsIndexing)
                         return;
                 }
+                Thread.Sleep(10);
             }
         }
 
-        private void WaitForSearchResults(MainWindowViewModel viewModel, string[] searchResults, int timeout = 1000)
+        private void WaitForSearchResults(MainWindowViewModel viewModel, BlockingCollection<Action> callbacks, string[] searchResults, int timeout = 1000)
         {
             var sw = Stopwatch.StartNew();
             while (true)
@@ -75,16 +82,20 @@ namespace DirectoryIndexer.Tests
                 if(sw.ElapsedMilliseconds > timeout)
                     throw new TimeoutException("WaitForSearchResults");
 
-                try
-                {
-                    var actual = viewModel.SearchResults.OfType<string>().ToArray();
-                    if(actual.OrderBy(x => x).SequenceEqual(searchResults.OrderBy(x => x)))
-                        return;
-                }
-                catch
-                {
-                    //
-                }
+                ProcessCallbacks(callbacks);
+
+                var actual = viewModel.SearchResults.OfType<string>().ToArray();
+                if(actual.OrderBy(x => x).SequenceEqual(searchResults.OrderBy(x => x)))
+                    return;
+            }
+        }
+
+        private static void ProcessCallbacks(BlockingCollection<Action> callbacks)
+        {
+            Action action;
+            while (callbacks.TryTake(out action))
+            {
+                action();
             }
         }
     }

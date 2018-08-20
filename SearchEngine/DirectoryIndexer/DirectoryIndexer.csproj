@@ -48,7 +48,6 @@
     <Compile Include="Indexer.cs" />
     <Compile Include="Watchdog\ChangeKind.cs" />
     <Compile Include="Watchdog\DirectoryWatchdog.cs" />
-    <Compile Include="Watchdog\FileWatchdog.cs" />
     <Compile Include="Watchdog\IWatchdogThread.cs" />
     <Compile Include="Watchdog\WatchdogEventArgs.cs" />
     <Compile Include="IndexingEventArgs.cs" />

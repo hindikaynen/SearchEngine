@@ -176,6 +176,43 @@ namespace DirectoryIndexer.Tests
             CollectionAssert.AreEquivalent(new[] { file2, file3 }, result);
         }
 
+        [Test]
+        public void ShouldAddFile()
+        {
+            var file1 = Path.Combine(_directory, "1.txt");
+            File.WriteAllText(file1, "hello world");
+            var analyzer = new SimpleAnalyzer();
+            var store = new InMemoryStore();
+
+            BlockingCollection<IndexingEventArgs> events = new BlockingCollection<IndexingEventArgs>();
+
+            var indexer = new Indexer(new SearchIndex(analyzer, store));
+            indexer.IndexingProgress += (o, e) => events.Add(e);
+            indexer.AddFile(file1);
+
+            WaitForIndexed(events);
+
+            var result = indexer.Search("hello world");
+            CollectionAssert.AreEquivalent(new[] { file1 }, result);
+
+            File.WriteAllText(file1, "another content");
+
+            WaitForIndexed(events);
+
+            result = indexer.Search("hello world");
+            CollectionAssert.IsEmpty(result);
+
+            result = indexer.Search("another");
+            CollectionAssert.AreEquivalent(new[] { file1 }, result);
+
+            File.Delete(file1);
+
+            WaitForIndexed(events);
+
+            result = indexer.Search("another");
+            CollectionAssert.IsEmpty(result);
+        }
+
         private static void WaitForIndexed(BlockingCollection<IndexingEventArgs> events)
         {
             Thread.Sleep(50);

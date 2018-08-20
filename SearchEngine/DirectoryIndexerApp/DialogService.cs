@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace DirectoryIndexerApp
 {
@@ -17,6 +19,22 @@ namespace DirectoryIndexerApp
                 return true;
             }
             folder = null;
+            return false;
+        }
+
+        public bool ShowOpenFilesDialog(string description, out IEnumerable<string> filePaths)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = description,
+                Multiselect = true
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                filePaths = dialog.FileNames.ToList();
+                return true;
+            }
+            filePaths = null;
             return false;
         }
     }

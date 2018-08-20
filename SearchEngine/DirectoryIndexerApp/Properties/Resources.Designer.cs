@@ -68,5 +68,14 @@ namespace DirectoryIndexerApp.Properties {
                 return ResourceManager.GetString("OpenDirectoryDescription", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select files to index.
+        /// </summary>
+        internal static string OpenFilesDescription {
+            get {
+                return ResourceManager.GetString("OpenFilesDescription", resourceCulture);
+            }
+        }
     }
 }
