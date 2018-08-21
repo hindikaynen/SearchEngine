@@ -16,7 +16,7 @@ namespace DirectoryIndexerApp
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private const string TxtFilter = "*.cs";
+        private const string TxtFilter = "*.txt";
         private readonly IDialogService _dialogService;
         private readonly IDispatcher _dispatcher;
         private readonly Indexer _indexer;
