@@ -16,7 +16,7 @@ namespace DirectoryIndexerApp
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private const string TxtFilter = "*.txt";
+        private const string TxtFilter = "*.cs";
         private readonly IDialogService _dialogService;
         private readonly IDispatcher _dispatcher;
         private readonly Indexer _indexer;
@@ -27,7 +27,6 @@ namespace DirectoryIndexerApp
         private readonly ObservableCollection<string> _searchResults = new ObservableCollection<string>();
         private readonly CollectionViewSource _searchResultsSource = new CollectionViewSource();
         private bool _isIndexing;
-        private bool _isSearching;
 
         public MainWindowViewModel(IDialogService dialogService, IDispatcher dispatcher)
         {
@@ -61,19 +60,6 @@ namespace DirectoryIndexerApp
                     return;
 
                 _isIndexing = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsSearching
-        {
-            get { return _isSearching; }
-            set
-            {
-                if(_isSearching == value)
-                    return;
-
-                _isSearching = value;
                 OnPropertyChanged();
             }
         }
