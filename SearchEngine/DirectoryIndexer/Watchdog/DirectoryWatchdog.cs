@@ -50,10 +50,19 @@ namespace DirectoryIndexer
         
         private void NofifyExisted()
         {
-            foreach (var filePath in Directory.GetFiles(_directoryPath, _filter, SearchOption.AllDirectories))
+            try
             {
-                Changed?.Invoke(this, new WatchdogEventArgs(filePath, ChangeKind.Existed));
-            }            
+                foreach (var filePath in Directory.GetFiles(_directoryPath, _filter, SearchOption.AllDirectories))
+                {
+                    Changed?.Invoke(this, new WatchdogEventArgs(filePath, ChangeKind.Existed));
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+            catch (IOException)
+            {
+            }
         }
 
         private void OnCreated(object sender, FileSystemEventArgs e)
