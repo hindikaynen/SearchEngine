@@ -9,6 +9,38 @@
         d:DataContext="{d:DesignInstance {x:Type local:MainWindowViewModel}}"
         Title="Directory indexer">
     
+    <Window.Resources>
+        <Style TargetType="ItemsControl" x:Key="VirtualizingItemsControlStyle">
+            <Style.Setters>
+                <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                    Padding="{TemplateBinding Control.Padding}"
+                                    BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                    Background="{TemplateBinding Panel.Background}"
+                                    SnapsToDevicePixels="True">
+                                <ScrollViewer Padding="{TemplateBinding Control.Padding}"
+                                              Focusable="False">
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VirtualizationMode="Recycling"/>
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style.Setters>
+        </Style>
+    </Window.Resources>
+    
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,21 +48,21 @@
         </Grid.RowDefinitions>
         
         <StackPanel Grid.Row="0" Name="IndexPanel">
-            <ScrollViewer MaxHeight="250">
-                <ItemsControl ItemsSource="{Binding TrackingPaths}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <TextBlock Margin="0,0,0,5">
-                                    <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
-                                        <TextBlock Text="{Binding}"/>
-                                    </Hyperlink>
-                                </TextBlock>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <ItemsControl ItemsSource="{Binding TrackingPaths}"
+                          Style="{StaticResource VirtualizingItemsControlStyle}"
+                          MaxHeight="250">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <TextBlock Margin="0,0,0,5">
+                                <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
+                                    <TextBlock Text="{Binding}"/>
+                                </Hyperlink>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
             
             <Button Content="Add directory..." Command="{Binding AddDirectoryCommand}"
                     HorizontalAlignment="Left"
@@ -70,27 +102,20 @@
                 </TextBox>
             </StackPanel>
 
-            <ScrollViewer Grid.Row="1"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Hidden">
-                <ItemsControl ItemsSource="{Binding SearchResults}"
-                              Margin="0,5,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Margin="0,0,0,5">
-                            <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
-                                <TextBlock Text="{Binding}"/>
-                            </Hyperlink>
-                        </TextBlock>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel VirtualizationMode="Recycling"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </ScrollViewer>
+            <ItemsControl ItemsSource="{Binding SearchResults}"
+                          Style="{StaticResource VirtualizingItemsControlStyle}"
+                          Grid.Row="1"
+                          Margin="0,5,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Margin="0,0,0,5">
+                        <Hyperlink local:HyperlinkBehavior.NavigateUri="{Binding}">
+                            <TextBlock Text="{Binding}"/>
+                        </Hyperlink>
+                    </TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Grid>
     </Grid>
 </Window>
