@@ -37,20 +37,14 @@ namespace DirectoryIndexer
 
         public void AddDirectory(string directoryPath, string filter)
         {
-            var watchdog = new DirectoryWatchdog(directoryPath, filter, _watchdogThread);
-            watchdog.Changed += OnChanged;
-            _watchdogs.Add(watchdog);
-            Notifying(() => Task.Factory.StartNew(watchdog.Start));
+            AddDirectoryWatchdog(directoryPath, filter);
         }
 
         public void AddFile(string filePath)
         {
             var directory = Path.GetDirectoryName(filePath);
             var filter = Path.GetFileName(filePath);
-            var watchdog = new DirectoryWatchdog(directory, filter, _watchdogThread);
-            watchdog.Changed += OnChanged;
-            _watchdogs.Add(watchdog);
-            Notifying(() => Task.Factory.StartNew(watchdog.Start));
+            AddDirectoryWatchdog(directory, filter);
         }
 
         public IEnumerable<string> Search(string searchString)
@@ -64,6 +58,14 @@ namespace DirectoryIndexer
                 if(!string.IsNullOrEmpty(filePath))
                     yield return filePath;
             }
+        }
+
+        private void AddDirectoryWatchdog(string directoryPath, string filter)
+        {
+            var watchdog = new DirectoryWatchdog(directoryPath, filter, _watchdogThread);
+            watchdog.Changed += OnChanged;
+            _watchdogs.Add(watchdog);
+            Notifying(() => Task.Factory.StartNew(watchdog.Start));
         }
 
         private void OnChanged(object sender, WatchdogEventArgs e)
@@ -85,7 +87,8 @@ namespace DirectoryIndexer
 
         private async void Notifying(Func<Task> taskFactory)
         {
-            NotifyProgress(Interlocked.Increment(ref _indexingCount));
+            int count = Interlocked.Increment(ref _indexingCount);
+            NotifyProgress(count - 1, count);
             try
             {
                 await taskFactory();
@@ -95,7 +98,8 @@ namespace DirectoryIndexer
             }
             finally
             {
-                NotifyProgress(Interlocked.Decrement(ref _indexingCount));
+                count = Interlocked.Decrement(ref _indexingCount);
+                NotifyProgress(count + 1, count);
             }
         }
 
@@ -132,12 +136,14 @@ namespace DirectoryIndexer
             _searchIndex.RemoveDocument(new Term(NameField, filePath));
         }
 
-        private void NotifyProgress(int count)
+        private void NotifyProgress(int oldValue, int newValue)
         {
-            if (count == 1)
-                IndexingProgress?.Invoke(this, new IndexingEventArgs(true));
-            if (count == 0)
-                IndexingProgress?.Invoke(this, new IndexingEventArgs(false));
+            bool oldIsIndexing = oldValue > 0;
+            bool newIsIndexing = newValue > 0;
+            if(oldIsIndexing == newIsIndexing)
+                return;
+
+            IndexingProgress?.Invoke(this, new IndexingEventArgs(newIsIndexing));
         }
 
         private bool WaitForFileUnlocked(string filePath, out Stream stream)

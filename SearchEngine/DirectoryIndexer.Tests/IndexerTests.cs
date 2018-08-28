@@ -52,6 +52,8 @@ namespace DirectoryIndexer.Tests
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] {file1, file2}, result);
+
+            indexer.Dispose();
         }
 
         [Test]
@@ -83,6 +85,8 @@ namespace DirectoryIndexer.Tests
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file1, file2, file5 }, result);
+
+            indexer.Dispose();
         }
 
         [Test]
@@ -113,6 +117,8 @@ namespace DirectoryIndexer.Tests
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file2 }, result);
+
+            indexer.Dispose();
         }
 
         [Test]
@@ -144,6 +150,8 @@ namespace DirectoryIndexer.Tests
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file2, file5 }, result);
+
+            indexer.Dispose();
         }
 
         [Test]
@@ -175,6 +183,8 @@ namespace DirectoryIndexer.Tests
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file2, file3 }, result);
+
+            indexer.Dispose();
         }
 
         [Test]
@@ -212,6 +222,8 @@ namespace DirectoryIndexer.Tests
 
             result = indexer.Search("another");
             CollectionAssert.IsEmpty(result);
+
+            indexer.Dispose();
         }
 
         [Test]
@@ -239,6 +251,8 @@ namespace DirectoryIndexer.Tests
 
             result = indexer.Search("hello");
             CollectionAssert.IsEmpty(result);
+
+            indexer.Dispose();
         }
 
         private static void WaitForIndexed(Indexer indexer, BlockingCollection<IndexingEventArgs> events)
@@ -251,9 +265,8 @@ namespace DirectoryIndexer.Tests
         {
             bool isIndexing = false;
             IndexingEventArgs args;
-            while (events.TryTake(out args, 500))
+            while (events.TryTake(out args, 50))
             {
-                Console.WriteLine(args.IsIndexing);
                 isIndexing = args.IsIndexing;
             }
             Assert.IsFalse(isIndexing);
