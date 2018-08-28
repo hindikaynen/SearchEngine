@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ConcurrentDictionaryExtensions.cs" />
     <Compile Include="Indexer.cs" />
     <Compile Include="Watchdog\ChangeKind.cs" />
     <Compile Include="Watchdog\DirectoryWatchdog.cs" />

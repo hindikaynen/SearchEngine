@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Schedulers;
@@ -31,7 +32,8 @@ namespace DirectoryIndexer
             _scheduler = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount);
         }
 
-        public event EventHandler<IndexingEventArgs> IndexingProgress; 
+        public event EventHandler<IndexingEventArgs> IndexingProgress;
+        internal bool HasIndexingTasks => _taskQueue.Any();
 
         public void AddDirectory(string directoryPath, string filter)
         {
@@ -84,9 +86,10 @@ namespace DirectoryIndexer
         private void EnqueueTask(string filePath, Action action)
         {
             NotifyProgress(Interlocked.Increment(ref _indexingCount));
-            _taskQueue.AddOrUpdate(filePath,
+            var indexTask = _taskQueue.AddOrUpdate(filePath,
                 path => Task.Factory.StartNew(action, _cts.Token, TaskCreationOptions.None, _scheduler),
                 (path, task) => task.ContinueWith(t => action(), _cts.Token, TaskContinuationOptions.None, _scheduler));
+            indexTask.ContinueWith(t => _taskQueue.RemoveByKeyValue(filePath, indexTask));
         }
 
         private void Index(string filePath)
