@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace DirectoryIndexer
 {
@@ -44,7 +45,7 @@ namespace DirectoryIndexer
 
         public void Start()
         {
-            NofifyExisted();
+            Task.Factory.StartNew(NofifyExisted);
             _watcher.EnableRaisingEvents = true;
         }
         
