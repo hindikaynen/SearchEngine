@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using System;
+using System.IO;
+using Moq;
 using NUnit.Framework;
 using SearchEngine.Analysis;
 using SearchEngine.MemoryStore;
@@ -49,7 +51,13 @@ namespace SearchEngine.Tests
         public void QueryRunnerSearch()
         {
             var analyzer = new Mock<IAnalyzer>();
-            analyzer.Setup(x => x.TransformToken(It.IsAny<string>())).Returns((string s) => s);
+            analyzer.Setup(x => x.Analyze(It.IsAny<Func<StreamReader>>())).Returns((Func<StreamReader> f) =>
+            {
+                using (var reader = f())
+                {
+                    return new[] { reader.ReadToEnd() };
+                }
+            });
             var store = new Mock<IStore>();
             store.Setup(x => x.WildcardSearch(It.IsAny<string>())).Returns((string s) => new[] {s});
             store.Setup(x => x.WildcardSearch("wor*")).Returns(new[] {"world", "worry"});

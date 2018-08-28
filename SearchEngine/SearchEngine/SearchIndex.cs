@@ -74,14 +74,21 @@ namespace SearchEngine
 
         IEnumerable<long> IQueryRunner.Search(string fieldName, string value)
         {
-            HashSet<long> result = new HashSet<long>();
-            var matches = _store.WildcardSearch(_analyzer.TransformToken(value));
-            foreach (var match in matches)
+            var result = new HashSet<long>();
+            foreach (var token in AnalyzeQuery(value))
             {
-                var postings = _store.GetPostings(fieldName, match);
+                var postings = _store.GetPostings(fieldName, token);
                 result.UnionWith(postings);
             }
             return result;
+        }
+
+        private IEnumerable<string> AnalyzeQuery(string query)
+        {
+            if (WildcardHelper.IsWildcardQuery(query))
+                return _store.WildcardSearch(query);
+
+            return _analyzer.Analyze(query.AsStreamReader);
         }
 
         private static string ReadFieldValue(Field field)
