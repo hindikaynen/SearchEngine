@@ -39,8 +39,8 @@ namespace DirectoryIndexer
         {
             var watchdog = new DirectoryWatchdog(directoryPath, filter, _watchdogThread);
             watchdog.Changed += OnChanged;
-            watchdog.Start();
             _watchdogs.Add(watchdog);
+            Notifying(() => Task.Factory.StartNew(watchdog.Start));
         }
 
         public void AddFile(string filePath)
@@ -49,8 +49,8 @@ namespace DirectoryIndexer
             var filter = Path.GetFileName(filePath);
             var watchdog = new DirectoryWatchdog(directory, filter, _watchdogThread);
             watchdog.Changed += OnChanged;
-            watchdog.Start();
             _watchdogs.Add(watchdog);
+            Notifying(() => Task.Factory.StartNew(watchdog.Start));
         }
 
         public IEnumerable<string> Search(string searchString)
@@ -83,29 +83,12 @@ namespace DirectoryIndexer
             }
         }
 
-        private void EnqueueTask(string filePath, Action action)
+        private async void Notifying(Func<Task> taskFactory)
         {
             NotifyProgress(Interlocked.Increment(ref _indexingCount));
-            var indexTask = _taskQueue.AddOrUpdate(filePath,
-                path => Task.Factory.StartNew(action, _cts.Token, TaskCreationOptions.None, _scheduler),
-                (path, task) => task.ContinueWith(t => action(), _cts.Token, TaskContinuationOptions.None, _scheduler));
-            indexTask.ContinueWith(t => _taskQueue.RemoveByKeyValue(filePath, indexTask));
-        }
-
-        private void Index(string filePath)
-        {
             try
             {
-                Stream stream;
-                if(!WaitForFileUnlocked(filePath, out stream))
-                    return;
-
-                var document = new Document();
-                document.AddField(new StringField(NameField, filePath, FieldFlags.Stored));
-                document.AddField(new TextField(ContentField, stream, FieldFlags.Analyzed));
-
-                _searchIndex.RemoveDocument(new Term(NameField, filePath));
-                _searchIndex.AddDocument(document);
+                await taskFactory();
             }
             catch (OperationCanceledException)
             {
@@ -116,17 +99,37 @@ namespace DirectoryIndexer
             }
         }
 
+        private void EnqueueTask(string filePath, Action action)
+        {
+            Notifying(() => EnqueueTaskCore(filePath, action));
+        }
+
+        private Task EnqueueTaskCore(string filePath, Action action)
+        {
+            var indexTask = _taskQueue.AddOrUpdate(filePath,
+                path => Task.Factory.StartNew(action, _cts.Token, TaskCreationOptions.None, _scheduler),
+                (path, task) => task.ContinueWith(t => action(), _cts.Token, TaskContinuationOptions.None, _scheduler));
+            indexTask.ContinueWith(t => _taskQueue.RemoveByKeyValue(filePath, indexTask));
+            return indexTask;
+        }
+
+        private void Index(string filePath)
+        {
+            Stream stream;
+            if(!WaitForFileUnlocked(filePath, out stream))
+                return;
+
+            var document = new Document();
+            document.AddField(new StringField(NameField, filePath, FieldFlags.Stored));
+            document.AddField(new TextField(ContentField, stream, FieldFlags.Analyzed));
+
+            _searchIndex.RemoveDocument(new Term(NameField, filePath));
+            _searchIndex.AddDocument(document);
+        }
+
         private void Unindex(string filePath)
         {
-            try
-            {
-                _searchIndex.RemoveDocument(new Term(NameField, filePath));
-            }
-            finally
-            {
-                NotifyProgress(Interlocked.Decrement(ref _indexingCount));
-            }
-            
+            _searchIndex.RemoveDocument(new Term(NameField, filePath));
         }
 
         private void NotifyProgress(int count)

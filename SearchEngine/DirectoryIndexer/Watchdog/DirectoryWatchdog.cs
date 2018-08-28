@@ -45,7 +45,7 @@ namespace DirectoryIndexer
 
         public void Start()
         {
-            Task.Factory.StartNew(NofifyExisted);
+            NofifyExisted();
             _watcher.EnableRaisingEvents = true;
         }
         

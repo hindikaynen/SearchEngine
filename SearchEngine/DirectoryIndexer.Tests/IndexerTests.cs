@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using NUnit.Framework;
@@ -47,7 +48,7 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory, "*.txt");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] {file1, file2}, result);
@@ -73,12 +74,12 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory, "*.txt");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var file5 = Path.Combine(_directory, "5.txt");
             File.WriteAllText(file5, "hello world again");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file1, file2, file5 }, result);
@@ -104,11 +105,11 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory, "*.txt");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             File.Delete(file1);
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file2 }, result);
@@ -134,12 +135,12 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory, "*.txt");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var file5 = Path.Combine(_directory, "5.txt");
             File.Move(file1, file5);
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file2, file5 }, result);
@@ -165,12 +166,12 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddDirectory(_directory, "*.txt");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             File.WriteAllText(file3, "hello world again");
             File.WriteAllText(file1, "smth another");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file2, file3 }, result);
@@ -190,14 +191,14 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddFile(file1);
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file1 }, result);
 
             File.WriteAllText(file1, "another content");
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             result = indexer.Search("hello world");
             CollectionAssert.IsEmpty(result);
@@ -207,7 +208,7 @@ namespace DirectoryIndexer.Tests
 
             File.Delete(file1);
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             result = indexer.Search("another");
             CollectionAssert.IsEmpty(result);
@@ -227,28 +228,45 @@ namespace DirectoryIndexer.Tests
             indexer.IndexingProgress += (o, e) => events.Add(e);
             indexer.AddFile(file1);
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             var result = indexer.Search("hello world");
             CollectionAssert.AreEquivalent(new[] { file1 }, result);
 
             File.Move(file1, Path.Combine(_directory, "2.txt"));
 
-            WaitForIndexed(events);
+            WaitForIndexed(indexer, events);
 
             result = indexer.Search("hello");
             CollectionAssert.IsEmpty(result);
         }
 
-        private static void WaitForIndexed(BlockingCollection<IndexingEventArgs> events)
+        private static void WaitForIndexed(Indexer indexer, BlockingCollection<IndexingEventArgs> events)
         {
-            Thread.Sleep(50);
-            while (true)
+            WaitForIndexingCompletedEvent(events);
+            WaitForNoIndexingTasks(indexer);
+        }
+        
+        private static void WaitForIndexingCompletedEvent(BlockingCollection<IndexingEventArgs> events)
+        {
+            bool isIndexing = false;
+            IndexingEventArgs args;
+            while (events.TryTake(out args, 500))
             {
-                IndexingEventArgs args;
-                Assert.IsTrue(events.TryTake(out args, 5000));
-                if(!args.IsIndexing)
-                    return;
+                Console.WriteLine(args.IsIndexing);
+                isIndexing = args.IsIndexing;
+            }
+            Assert.IsFalse(isIndexing);
+        }
+
+        private static void WaitForNoIndexingTasks(Indexer indexer, int timeout = 1000)
+        {
+            var sw = Stopwatch.StartNew();
+            while (indexer.HasIndexingTasks)
+            {
+                if(sw.ElapsedMilliseconds > timeout)
+                    throw new TimeoutException();
+                Thread.Sleep(10);
             }
         }
     }
