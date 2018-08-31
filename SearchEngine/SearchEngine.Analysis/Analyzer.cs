@@ -18,6 +18,9 @@ namespace SearchEngine.Analysis
                     foreach (var token in Tokenize(reader))
                     {
                         var transformed = TransformToken(token);
+                        if (!IsStopWord(token))
+                            yield return token;
+
                         if (!IsStopWord(transformed))
                             yield return transformed;
                     }

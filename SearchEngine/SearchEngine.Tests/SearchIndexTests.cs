@@ -70,7 +70,7 @@ namespace SearchEngine.Tests
 
             CollectionAssert.AreEquivalent(new[] {2, 3, 4}, result);
         }
-
+        
         [Test]
         public void GetFieldValue()
         {
@@ -124,6 +124,25 @@ namespace SearchEngine.Tests
             Assert.AreEqual(1, docs.Count);
 
             Assert.AreEqual("name3", searchIndex.GetFieldValue(docs[0], "name"));
+        }
+
+        [Test]
+        public void SearchWildcardOnProcessedToken()
+        {
+            var analyzer = new SimpleAnalyzer();
+            var store = new InMemoryStore();
+            var searchIndex = new SearchIndex(analyzer, store);
+
+            var doc1 = new Document();
+            doc1.AddField(new StringField("name", "name1", FieldFlags.Stored));
+            doc1.AddField(new StringField("content", "Hello world", FieldFlags.Analyzed));
+            searchIndex.AddDocument(doc1);
+
+            var query = new TermQuery(new Term("content", "Hell*"));
+            var docs = searchIndex.Search(query);
+            Assert.AreEqual(1, docs.Count);
+
+            Assert.AreEqual("name1", searchIndex.GetFieldValue(docs[0], "name"));
         }
     }
 }
